@@ -25,7 +25,7 @@ public class FuryBornItems {
 
     public static final RegistryObject<Item> ROBYTE_SPAWN_EGG =
             Furyborn.ITEMS.register("robyte_spawn_egg",
-                    () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBYTE, 0x22b341, 0x19732e,
+                    () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBYTE, 0xf8f8ff, 0x00fa9a,
                             new Item.Properties()));
 
     public static void register(IEventBus eventBus){
