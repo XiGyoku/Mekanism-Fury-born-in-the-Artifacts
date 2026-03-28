@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "mmrobits:item/over_analysed_robit_datamodel"
+    }
+}
+

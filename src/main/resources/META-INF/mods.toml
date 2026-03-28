@@ -25,7 +25,7 @@ displayName = "${mod_name}" #mandatory
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL = "https://github.com/XiGyoku/Mekanism-Fury-born-in-the-Artifacts" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="furyborn.png" #optional
+logoFile="assets/${mod_id}/mod_icon.png"
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI

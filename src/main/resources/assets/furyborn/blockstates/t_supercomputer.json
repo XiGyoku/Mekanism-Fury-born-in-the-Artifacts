@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "furyborn:block/t_supercomputer" },
+    "facing=south": { "model": "furyborn:block/t_supercomputer", "y": 180 },
+    "facing=east": { "model": "furyborn:block/t_supercomputer", "y": 90 },
+    "facing=west": { "model": "furyborn:block/t_supercomputer", "y": 270 }
+  }
+}
