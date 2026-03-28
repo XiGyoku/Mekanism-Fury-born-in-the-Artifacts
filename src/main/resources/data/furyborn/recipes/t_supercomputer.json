@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OBO",
+    "OPO",
+    "UUU"
+  ],
+  "key": {
+    "O": {
+      "item": "mekanism:ingot_osmium"
+    },
+    "B": {
+      "item": "mekanism:block_steel"
+    },
+    "P": {
+      "item": "mekanism:pellet_antimatter"
+    },
+    "U": {
+      "item": "mekanism:ultimate_control_circuit"
+    }
+  },
+  "result": {
+    "item": "furyborn:t_supercomputer"
+  }
+}

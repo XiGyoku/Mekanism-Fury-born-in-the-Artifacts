@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "mekanism:robit"
+    },
+    {
+      "item": "mekanism:ultimate_control_circuit"
+    }
+  ],
+  "result": {
+    "item": "furyborn:robit_datamodel"
+  }
+}
