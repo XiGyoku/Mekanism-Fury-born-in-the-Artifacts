@@ -34,6 +34,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 
 public class RobyteEntity extends Monster implements GeoEntity {
+    private boolean enteredFinalPhase = false;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
@@ -62,7 +63,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     private <E extends RobyteEntity> PlayState predicate(AnimationState<E> state) {
         if (this.isDeadOrDying()) {
-            state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("Defeated"));
+            if (this.enteredFinalPhase) {
+                state.getController().setAnimation(RawAnimation.begin()
+                        .thenPlayAndHold("Defeated"));
+            } else {
+                return PlayState.STOP;
+            }
             return PlayState.CONTINUE;
         }
         if (this.tickCount < 40) {
@@ -104,12 +110,27 @@ public class RobyteEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if (!this.isDeadOrDying() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
+            this.enteredFinalPhase = true;
+        }
+    }
+
+    @Override
     protected void tickDeath() {
         ++this.deathTime;
 
-        if (this.deathTime == 140 && !this.level().isClientSide()) {
-            this.level().broadcastEntityEvent(this, (byte)60);
-            this.remove(Entity.RemovalReason.KILLED);
+        if (this.enteredFinalPhase) {
+            if (this.deathTime == 140 && !this.level().isClientSide()) {
+                this.level().broadcastEntityEvent(this, (byte)60);
+                this.remove(Entity.RemovalReason.KILLED);
+            }
+        } else {
+            if (this.deathTime == 1 && !this.level().isClientSide()) {
+                this.level().broadcastEntityEvent(this, (byte)60);
+                this.remove(Entity.RemovalReason.KILLED);
+            }
         }
     }
 }
