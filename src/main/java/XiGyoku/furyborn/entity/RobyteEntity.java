@@ -56,6 +56,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public final int PHASE_TRANSITION_DUR = 60;
     public final int CANNON_DUR = 280;
 
+    private boolean hasSummonedArea = false;
+
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
         this.setNoGravity(true);
@@ -207,11 +209,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
         super.tick();
 
         if (!this.level().isClientSide()) {
-            if (this.tickCount == 1) {
+            if (!this.hasSummonedArea) {
                 RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
                 areaEntity.moveTo(this.getX(), this.getY() - 2.0f, this.getZ(), this.getYRot(), this.getXRot());
                 areaEntity.setRobyte(this);
                 this.level().addFreshEntity(areaEntity);
+                this.hasSummonedArea = true;
             }
             if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
                 this.setEnteredFinalPhase(true);
@@ -305,5 +308,19 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     @Override
     protected void jumpFromGround() {
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        compoundTag.putBoolean("HasSummonedArea", this.hasSummonedArea);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        if (compoundTag.contains("HasSummonedArea")) {
+            this.hasSummonedArea = compoundTag.getBoolean("HasSummonedArea");
+        }
     }
 }
