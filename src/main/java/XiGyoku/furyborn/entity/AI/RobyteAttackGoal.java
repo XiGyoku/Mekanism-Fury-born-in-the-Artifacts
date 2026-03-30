@@ -1,6 +1,7 @@
 package XiGyoku.furyborn.entity.AI;
 
 import XiGyoku.furyborn.entity.RobyteEntity;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -44,7 +45,11 @@ public class RobyteAttackGoal extends Goal {
             double dx = target.getX() - mob.getX();
             double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
             double dz = target.getZ() - mob.getZ();
-            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.1D);
+            float targetYaw = (float)(Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+            mob.setYRot(targetYaw);
+            mob.yHeadRot = targetYaw;
+            mob.yBodyRot = targetYaw;
+            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.2D);
             mob.setDeltaMovement(dashVec);
 
             if (aTick % 5 == 0) {
