@@ -41,7 +41,7 @@ public class RobyteAttackGoal extends Goal {
 
         int aTick = mob.getAttackTick();
         if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
-            mob.getNavigation().moveTo(target, 1.2D);
+            mob.getNavigation().moveTo(target, 2.4D);
             if (aTick % 5 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
                     if (entity != mob && entity.isAlive()) {

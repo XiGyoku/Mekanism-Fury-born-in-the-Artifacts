@@ -229,7 +229,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 }
                 if (cTick > CANNON_DUR) {
                     this.setCannonTick(0);
-                    this.attackCooldown = 40;
+                    this.attackCooldown = 20;
                 }
             }
 
@@ -238,7 +238,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.setAttackTick(aTick + 1);
                 if (aTick > ROTATION_TOTAL_ATTACK_DUR) {
                     this.setAttackTick(0);
-                    this.attackCooldown = 40;
+                    this.attackCooldown = 20;
                 }
             }
 
