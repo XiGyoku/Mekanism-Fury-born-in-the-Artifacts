@@ -50,7 +50,9 @@ public class RobyteAttackGoal extends Goal {
             mob.yHeadRot = targetYaw;
             mob.yBodyRot = targetYaw;
             net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.3D);
-            mob.setDeltaMovement(dashVec);
+            if (mob.hurtTime == 0) {
+                mob.setDeltaMovement(dashVec);
+            }
 
             if (aTick % 5 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
@@ -70,7 +72,9 @@ public class RobyteAttackGoal extends Goal {
 
         if (mob.getCannonTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR))) {
             mob.getNavigation().stop();
-            mob.setDeltaMovement(0, 0, 0);
+            if (mob.hurtTime == 0) {
+                mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.5D, 0.5D, 0.5D));
+            }
             mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
         }
     }
