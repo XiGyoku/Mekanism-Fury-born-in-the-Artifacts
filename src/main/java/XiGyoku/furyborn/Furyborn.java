@@ -1,6 +1,7 @@
 package XiGyoku.furyborn;
 
 import XiGyoku.furyborn.block.FuryBornBlocks;
+import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.entity.client.RobyteAreaRenderer;
 import XiGyoku.furyborn.entity.client.RobyteRenderer;
@@ -73,6 +74,7 @@ public class Furyborn {
         // Custom Registration
         FuryBornBlocks.register(modEventBus);
         FuryBornItems.register(modEventBus);
+        FuryBornEffects.register(modEventBus);
 
         FuryBornEntityTypes.register(modEventBus);
 
