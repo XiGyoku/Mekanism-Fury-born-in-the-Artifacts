@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.entity;
 
+import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
 import XiGyoku.furyborn.entity.client.RobyteAreaEntity;
 import net.minecraft.core.BlockPos;
@@ -9,8 +10,10 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -222,6 +225,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.setAttackTick(0);
                 this.setCannonTick(0);
             }
+            if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
+                if (this.tickCount % 15 == 0) {
+                    shootWitherSkull();
+                }
+            }
 
             int cTick = this.getCannonTick();
             if (cTick > 0) {
@@ -283,7 +291,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
     @Override
     protected void tickDeath() {
         ++this.deathTime;
-
+        if (this.deathTime == 1) {
+            this.setNoGravity(false);
+            net.minecraft.world.phys.Vec3 currentMovement = this.getDeltaMovement();
+            this.setDeltaMovement(currentMovement.x, -2.5D, currentMovement.z);
+        }
         if (this.hasEnteredFinalPhase()) {
             if (this.deathTime >= 140 && !this.level().isClientSide()) {
                 this.level().broadcastEntityEvent(this, (byte)60);
@@ -295,6 +307,38 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.remove(Entity.RemovalReason.KILLED);
             }
         }
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        if (source.getEntity() instanceof Player player) {
+            if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
+                player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));
+            }
+        }
+        if (!this.hasEnteredFinalPhase() && this.getAttackTick() > 0) {
+            if (source.is(DamageTypeTags.IS_PROJECTILE)) {
+                this.playSound(SoundEvents.SHIELD_BLOCK, 1.0F, 1.0F);
+                return false;
+            }
+        }
+        if (this.hasEnteredFinalPhase()) {
+            if (source.getDirectEntity() != null && !source.isIndirect()) {
+                return false;
+            }
+        }
+        return super.hurt(source, amount);
+    }
+
+    @Override
+    public boolean doHurtTarget(Entity target) {
+        boolean hurt = super.doHurtTarget(target);
+        if (hurt && target instanceof Player player) {
+            if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
+                player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));
+            }
+        }
+        return hurt;
     }
 
     @Override
