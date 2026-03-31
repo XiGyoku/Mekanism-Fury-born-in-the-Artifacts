@@ -41,6 +41,7 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class RobyteEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> ATTACK_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
@@ -219,6 +220,33 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.level().addFreshEntity(areaEntity);
                 this.hasSummonedArea = true;
             }
+            if (!this.isDeadOrDying()) {
+                RobyteAreaEntity myArea = null;
+                List<RobyteAreaEntity> areas = this.level().getEntitiesOfClass(
+                        RobyteAreaEntity.class,
+                        this.getBoundingBox().inflate(128.0D)
+                );
+                for (RobyteAreaEntity area : areas) {
+                    if (this.getUUID().equals(area.getRobyteId())) {
+                        myArea = area;
+                        break;
+                    }
+                }
+                if (myArea != null && !myArea.isEntityInsideArea(this)) {
+                    double dx = myArea.getX() - this.getX();
+                    double dz = myArea.getZ() - this.getZ();
+                    double length = Math.sqrt(dx * dx + dz * dz);
+                    if (length > 0) {
+                        double pushForce = 0.5;
+                        this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
+                    }
+                    if (this.getY() > myArea.getY() + 60.0) {
+                        this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
+                    } else if (this.getY() < myArea.getY() - 2.0) {
+                        this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
+                    }
+                }
+            }
             if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
                 this.setEnteredFinalPhase(true);
                 this.phaseTransitionTick = 1;
@@ -273,7 +301,6 @@ public class RobyteEntity extends Monster implements GeoEntity {
             double d0 = target.getX() - this.getX();
             double d1 = target.getY(0.5D) - this.getY(1.0D);
             double d2 = target.getZ() - this.getZ();
-
             net.minecraft.world.phys.Vec3 look = this.getViewVector(1.0F);
 
             double spawnX = this.getX() + look.x * 1.0D;
@@ -282,7 +309,6 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
             WitherSkull skull = new WitherSkull(this.level(), this, d0, d1, d2);
             skull.setPos(spawnX, spawnY, spawnZ);
-
             this.level().addFreshEntity(skull);
             this.playSound(SoundEvents.WITHER_SHOOT, 1.0F, 1.0F);
         }
@@ -311,7 +337,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (source.getEntity() instanceof Player player) {
+        if (!this.isDeadOrDying() && source.getEntity() instanceof Player player) {
             if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
                 player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));
             }
@@ -333,7 +359,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
     @Override
     public boolean doHurtTarget(Entity target) {
         boolean hurt = super.doHurtTarget(target);
-        if (hurt && target instanceof Player player) {
+        if (!this.isDeadOrDying() && hurt && target instanceof Player player) {
             if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
                 player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));
             }

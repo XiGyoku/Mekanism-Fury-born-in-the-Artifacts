@@ -27,6 +27,10 @@ public class RobyteAreaEntity extends Entity {
         this.bossId = robyte.getUUID();
     }
 
+    public UUID getRobyteId() {
+        return this.bossId;
+    }
+
     public boolean isPlayerInsideArea(Player player) {
         double radius = 64.0;
         double height = 64.0;
@@ -40,6 +44,21 @@ public class RobyteAreaEntity extends Entity {
         return player.getX() >= minX && player.getX() <= maxX &&
                 player.getY() >= minY && player.getY() <= maxY &&
                 player.getZ() >= minZ && player.getZ() <= maxZ;
+    }
+
+    public boolean isEntityInsideArea(Entity entity) {
+        double radius = 64.0;
+        double height = 64.0;
+        double minX = this.getX() - radius;
+        double maxX = this.getX() + radius;
+        double minY = this.getY();
+        double maxY = this.getY() + height;
+        double minZ = this.getZ() - radius;
+        double maxZ = this.getZ() + radius;
+
+        return entity.getX() >= minX && entity.getX() <= maxX &&
+                entity.getY() >= minY && entity.getY() <= maxY &&
+                entity.getZ() >= minZ && entity.getZ() <= maxZ;
     }
 
     @Override
