@@ -84,8 +84,8 @@ public class RobyteAreaEntity extends Entity {
                             }
                         }
                         if (!isSafeInAnotherArea) {
-                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 0));
-                            player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0));
+                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 2));
+                            player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 2));
                             if (player.tickCount % 20 == 0) {
                                 player.hurt(serverLevel.damageSources().magic(), 2.0F);
                             }
