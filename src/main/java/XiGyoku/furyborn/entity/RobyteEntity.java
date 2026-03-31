@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.entity;
 
+import XiGyoku.furyborn.client.sound.ClientSoundHelper;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
 import XiGyoku.furyborn.entity.client.RobyteAreaEntity;
@@ -63,8 +64,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     private boolean hasSummonedArea = false;
     public int teleportCooldown = 0;
-    public int bgmTick = 0;
-    public final int BGM_LENGTH_TICKS = 400;
+    private boolean hasStartedClientBgm = false;
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -216,13 +216,13 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public void tick() {
         super.tick();
 
-        if (!this.level().isClientSide()) {
-            if (this.bgmTick <= 0) {
-                this.playSound(FuryBornSounds.ROBYTE_BGM.get(), 5.0F, 1.0F);
-                this.bgmTick = BGM_LENGTH_TICKS;
-            } else {
-                this.bgmTick--;
+        if (this.level().isClientSide() && !this.isDeadOrDying()) {
+            if (!this.hasStartedClientBgm) {
+                ClientSoundHelper.playRobyteBgm(this);
+                this.hasStartedClientBgm = true;
             }
+        }
+        if (!this.level().isClientSide()) {
             if (!this.hasSummonedArea) {
                 RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
                 areaEntity.moveTo(this.getX(), this.getY() - 2.0f, this.getZ(), this.getYRot(), this.getXRot());
@@ -236,7 +236,6 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
             LivingEntity target = this.getTarget();
             if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
-                if (this.distanceToSqr(player) > 32.0 * 32.0) {
                     float yRot = player.getYRot();
 
                     double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
@@ -253,7 +252,6 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     this.playSound(FuryBornSounds.ROBYTE_TELEPORT.get(), 1.0F, 1.0F);
 
                     this.teleportCooldown = 400;
-                }
             }
             if (!this.isDeadOrDying()) {
                 RobyteAreaEntity myArea = null;
@@ -341,10 +339,20 @@ public class RobyteEntity extends Monster implements GeoEntity {
             double spawnX = this.getX() + look.x * 1.0D;
             double spawnY = this.getY(1.5D) - 2.0D;
             double spawnZ = this.getZ() + look.z * 1.0D;
+            double[] angles = {-20.0, 0.0, 20.0};
 
-            WitherSkull skull = new WitherSkull(this.level(), this, d0, d1, d2);
-            skull.setPos(spawnX, spawnY, spawnZ);
-            this.level().addFreshEntity(skull);
+            for (double angle : angles) {
+                double radians = Math.toRadians(angle);
+                double rotX = d0 * Math.cos(radians) - d2 * Math.sin(radians);
+                double rotZ = d0 * Math.sin(radians) + d2 * Math.cos(radians);
+
+                WitherSkull skull = new WitherSkull(this.level(), this, rotX, d1, rotZ);
+                skull.setPos(spawnX, spawnY, spawnZ);
+                skull.xPower *= 1.5D;
+                skull.yPower *= 1.5D;
+                skull.zPower *= 1.5D;
+                this.level().addFreshEntity(skull);
+            }
             this.playSound(SoundEvents.WITHER_SHOOT, 1.0F, 1.0F);
         }
     }

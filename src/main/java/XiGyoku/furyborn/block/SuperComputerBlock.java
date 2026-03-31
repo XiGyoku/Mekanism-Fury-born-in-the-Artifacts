@@ -59,7 +59,7 @@ public class SuperComputerBlock extends Block {
                     heldItem.shrink(1);
                 }
 
-                level.playSound(null, pos, FuryBornSounds.SUPERCOMPUTER_LOADING.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.playSound(null, pos, FuryBornSounds.SUPERCOMPUTER_LOADING.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
 
                 level.scheduleTick(pos, this, 100);
             }
@@ -78,7 +78,7 @@ public class SuperComputerBlock extends Block {
         if (robyteEntity != null) {
             robyteEntity.moveTo(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
             level.addFreshEntity(robyteEntity);
-            level.playSound(null, pos, FuryBornSounds.ROBYTE_GETUP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, pos, FuryBornSounds.ROBYTE_GETUP.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
         }
     }
 }
