@@ -39,7 +39,7 @@ public class RobyteAreaRenderer extends EntityRenderer<RobyteAreaEntity> {
 
         VertexConsumer innerConsumer = pBuffer.getBuffer(RenderType.entityTranslucent(frames.get(currentFrame)));
         renderBox(poseStack, innerConsumer, radius, height, tileSize, enlightment, 1.0f);
-        VertexConsumer outerConsumer = pBuffer.getBuffer(RenderType.entityTranslucent(PORTAL_TEXTURE));
+        VertexConsumer outerConsumer = pBuffer.getBuffer(RenderType.entitySolid(PORTAL_TEXTURE));
         poseStack.pushPose();
 
         float offset = 0.5f;
@@ -48,7 +48,7 @@ public class RobyteAreaRenderer extends EntityRenderer<RobyteAreaEntity> {
 
         poseStack.translate(0, -offset, 0);
         poseStack.scale(scaleXZ, scaleY, scaleXZ);
-        renderBox(poseStack, outerConsumer, radius, height, tileSize, enlightment, 0.6f);
+        renderBox(poseStack, outerConsumer, radius, height, tileSize, enlightment, 1.0f);
         poseStack.popPose();
     }
 

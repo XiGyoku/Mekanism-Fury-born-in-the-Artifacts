@@ -62,6 +62,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public final int CANNON_DUR = 280;
 
     private boolean hasSummonedArea = false;
+    private RobyteAreaEntity cachedArea = null;
     public int teleportCooldown = 0;
     private boolean hasStartedClientBgm = false;
 
@@ -228,6 +229,14 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 areaEntity.setRobyte(this);
                 this.level().addFreshEntity(areaEntity);
                 this.hasSummonedArea = true;
+                this.cachedArea = areaEntity;
+            }else if(this.cachedArea == null) {
+                for (RobyteAreaEntity area : this.level().getEntitiesOfClass(RobyteAreaEntity.class, this.getBoundingBox().inflate(128.0D))) {
+                    if (this.getUUID().equals(area.getRobyteId())) {
+                        this.cachedArea = area;
+                        break;
+                    }
+                }
             }
             if (this.teleportCooldown > 0) {
                 this.teleportCooldown--;
@@ -235,8 +244,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
             LivingEntity target = this.getTarget();
             if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
+                if (this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
                     float yRot = player.getYRot();
-
                     double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
                     double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
 
@@ -249,33 +258,24 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     this.setYRot(player.getYRot());
 
                     this.playSound(FuryBornSounds.ROBYTE_TELEPORT.get(), 1.0F, 1.0F);
-
                     this.teleportCooldown = 400;
-            }
-            if (!this.isDeadOrDying()) {
-                RobyteAreaEntity myArea = null;
-                List<RobyteAreaEntity> areas = this.level().getEntitiesOfClass(
-                        RobyteAreaEntity.class,
-                        this.getBoundingBox().inflate(128.0D)
-                );
-                for (RobyteAreaEntity area : areas) {
-                    if (this.getUUID().equals(area.getRobyteId())) {
-                        myArea = area;
-                        break;
-                    }
                 }
-                if (myArea != null && !myArea.isEntityInsideArea(this)) {
-                    double dx = myArea.getX() - this.getX();
-                    double dz = myArea.getZ() - this.getZ();
-                    double length = Math.sqrt(dx * dx + dz * dz);
-                    if (length > 0) {
-                        double pushForce = 0.5;
-                        this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
-                    }
-                    if (this.getY() > myArea.getY() + 60.0) {
-                        this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
-                    } else if (this.getY() < myArea.getY() - 2.0) {
-                        this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
+            }
+            if (!this.isDeadOrDying() && this.cachedArea != null) {
+                if (!this.isDeadOrDying() && this.cachedArea != null) {
+                    if (!this.cachedArea.isEntityInsideArea(this)) {
+                        double dx = this.cachedArea.getX() - this.getX();
+                        double dz = this.cachedArea.getZ() - this.getZ();
+                        double length = Math.sqrt(dx * dx + dz * dz);
+                        if (length > 0) {
+                            double pushForce = 0.5;
+                            this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
+                        }
+                        if (this.getY() > this.cachedArea.getY() + 60.0) {
+                            this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
+                        } else if (this.getY() < this.cachedArea.getY() - 2.0) {
+                            this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
+                        }
                     }
                 }
             }
