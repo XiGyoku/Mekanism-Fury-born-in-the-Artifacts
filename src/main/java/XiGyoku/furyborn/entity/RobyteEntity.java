@@ -290,7 +290,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             }
             if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
                 if (this.tickCount % 15 == 0) {
-                    shootThreeWitherSkull();
+                    shootFiveWitherSkull();
                 }
             }
 
@@ -360,7 +360,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
         }
     }
 
-    private void shootThreeWitherSkull() {
+    private void shootFiveWitherSkull() {
         LivingEntity target = this.getTarget();
         if (target != null) {
             double d0 = target.getX() - this.getX();
@@ -371,7 +371,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             double spawnX = this.getX() + look.x * 1.0D;
             double spawnY = this.getY(1.5D) - 2.0D;
             double spawnZ = this.getZ() + look.z * 1.0D;
-            double[] angles = {-10.0, 0.0, 10.0};
+            double[] angles = {-40.0,-20.0, 0.0, 20.0,40.0};
 
             for (double angle : angles) {
                 double radians = Math.toRadians(angle);

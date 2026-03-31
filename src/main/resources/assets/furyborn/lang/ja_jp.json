@@ -1,0 +1,17 @@
+{
+  "entity.furyborn.robyte": "反逆のロビット",
+  "entity.furyborn.robyte_area": "決戦のバトルフィールド",
+  "item.furyborn.robyte_spawn_egg": "反逆のロビットのスポーンエッグ",
+  "subtitles.furyborn.t_supercomputer_loading": "スーパーコンピュータが起動しています",
+  "subtitles.furyborn.robyte_teleport": "反逆のロビットのテレポート",
+  "subtitles.furyborn.robyte_getup": "反逆のロビットがスポーン",
+  "itemGroup.example_tab": "FuryBorn",
+  "item.furyborn.t_supercomputer": "スーパーコンピューター帝",
+  "block.furyborn.t_supercomputer": "スーパーコンピューター帝",
+  "item.furyborn.robit_datamodel": "ロビットのデータモデル",
+  "item.furyborn.robyte_datamodel": "ロビットの過学習データモデル",
+  "item.furyborn.t_supercomputer_desc": "量子演算を行うスーパーコンピュータ。データモデルを処理することが出来る。",
+  "item.furyborn.robit_datamodel_desc": "ロビットのデータモデル。ロビットの情報が記録されている。",
+  "item.furyborn.robyte_datamodel_desc": "ロビットの過学習データモデル。保存された情報に変化が生じている。",
+  "effect.furyborn.monitored": "監視"
+}

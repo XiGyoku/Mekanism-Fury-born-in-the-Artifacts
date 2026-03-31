@@ -54,8 +54,8 @@ public class Furyborn {
     // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "furyborn" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
-    // Creates a creative tab with the id "furyborn:example_tab" for the example item, that is placed after the combat tab
-    public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder().icon(() -> FuryBornItems.ROBYTE_DATA_MODEL.get().getDefaultInstance()).displayItems((parameters, output) -> {
+    // Creates a creative tab with the id "furyborn:furyborn_tab" for the example item, that is placed after the combat tab
+    public static final RegistryObject<CreativeModeTab> FURYBORN_TAB = CREATIVE_MODE_TABS.register("furyborn_tab", () -> CreativeModeTab.builder().icon(() -> FuryBornItems.ROBYTE_DATA_MODEL.get().getDefaultInstance()).displayItems((parameters, output) -> {
         output.accept(FuryBornItems.T_SUPER_BLOCK_ITEM.get());
         output.accept(FuryBornItems.ROBYTE_DATA_MODEL.get());
         output.accept(FuryBornItems.ROBIT_DATA_MODEL.get());

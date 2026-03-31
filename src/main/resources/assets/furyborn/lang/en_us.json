@@ -1,0 +1,17 @@
+{
+  "entity.furyborn.robyte": "Robyte - FuryBorn in the Artifacts",
+  "entity.furyborn.robyte_area": "KBF",
+  "item.furyborn.robyte_spawn_egg": "Robyte Spawn Egg",
+  "subtitles.furyborn.t_supercomputer_loading": "Supercomputer boots up",
+  "subtitles.furyborn.robyte_teleport": "Robyte teleports",
+  "subtitles.furyborn.robyte_getup": "Robyte awakens",
+  "itemGroup.furyborn_tab": "FuryBorn",
+  "item.furyborn.t_supercomputer": "Supercomputer T",
+  "item.furyborn.t_supercomputer_desc": "A quantum supercomputer capable of processing data models.",
+  "block.furyborn.t_supercomputer": "Supercomputer T",
+  "item.furyborn.robit_datamodel": "Robit Data Model",
+  "item.furyborn.robit_datamodel_desc": "A foundational data model. Contains recorded information of a Robit.",
+  "item.furyborn.robyte_datamodel": "Overfitted Robit Data Model",
+  "item.furyborn.robyte_datamodel_desc": "An overfitted data model of a Robit. Its internal data has mysteriously mutated.",
+  "effect.furyborn.monitored": "Monitored"
+}
