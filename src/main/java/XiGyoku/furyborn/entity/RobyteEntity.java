@@ -289,7 +289,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             }
             if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
                 if (this.tickCount % 15 == 0) {
-                    shootWitherSkull();
+                    shootThreeWitherSkull();
                 }
             }
 
@@ -298,11 +298,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.setCannonTick(cTick + 1);
                 this.getNavigation().stop();
                 if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
-                    if(!this.hasEnteredFinalPhase()) {
-                        shootWitherSkull();
-                    }else {
-                        shootThreeWitherSkull();
-                    }
+                    shootWitherSkull();
                 }
                 if (cTick > CANNON_DUR) {
                     this.setCannonTick(0);
