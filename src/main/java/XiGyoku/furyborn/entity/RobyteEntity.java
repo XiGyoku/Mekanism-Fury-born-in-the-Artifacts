@@ -381,6 +381,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public boolean removeWhenFarAway(double pDistanceToClosestPlayer) {
+        return false;
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("HasSummonedArea", this.hasSummonedArea);
