@@ -339,7 +339,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             double spawnX = this.getX() + look.x * 1.0D;
             double spawnY = this.getY(1.5D) - 2.0D;
             double spawnZ = this.getZ() + look.z * 1.0D;
-            double[] angles = {-20.0, 0.0, 20.0};
+            double[] angles = {-10.0, 0.0, 10.0};
 
             for (double angle : angles) {
                 double radians = Math.toRadians(angle);
