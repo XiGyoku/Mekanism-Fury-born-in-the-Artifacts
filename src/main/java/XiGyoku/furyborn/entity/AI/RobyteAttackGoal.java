@@ -54,7 +54,7 @@ public class RobyteAttackGoal extends Goal {
                 mob.setDeltaMovement(dashVec);
             }
 
-            if (aTick % 2 == 0) {
+            if (true) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
                     if (entity != mob && entity.isAlive()) {
                         float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
