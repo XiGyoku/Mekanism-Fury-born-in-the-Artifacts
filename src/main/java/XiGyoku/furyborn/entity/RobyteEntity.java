@@ -412,6 +412,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            return false;
+        }
         if (!this.isDeadOrDying() && source.getEntity() instanceof Player player) {
             if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
                 player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));
@@ -452,6 +455,14 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public void stopSeenByPlayer(ServerPlayer pPlayer) {
         super.stopSeenByPlayer(pPlayer);
         this.bossEvent.removePlayer(pPlayer);
+    }
+
+    @Override
+    public void remove(RemovalReason pReason) {
+        if (pReason == RemovalReason.DISCARDED && this.getHealth() > 0) {
+            return;
+        }
+        super.remove(pReason);
     }
 
     @Override
