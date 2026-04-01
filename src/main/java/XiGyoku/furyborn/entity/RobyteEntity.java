@@ -238,6 +238,10 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     }
                 }
             }
+            if (this.cachedArea != null && this.cachedArea.isRemoved()) {
+                this.cachedArea = null;
+                this.hasSummonedArea = false;
+            }
 
             if (this.tickCount >= 40) {
             if (this.teleportCooldown > 0) {
