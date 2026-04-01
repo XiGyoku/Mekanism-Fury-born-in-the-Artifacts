@@ -245,7 +245,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             }
             LivingEntity target = this.getTarget();
             if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
-                if (this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
+                if (this.cachedArea != null && this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
                     float yRot = player.getYRot();
                     double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
                     double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
