@@ -115,12 +115,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 400.0)
-                .add(Attributes.ATTACK_DAMAGE, 4.0)
-                .add(Attributes.ATTACK_SPEED, 1.0f)
+                .add(Attributes.MAX_HEALTH, 4000.0)
+                .add(Attributes.ATTACK_DAMAGE, 10.0)
+                .add(Attributes.ATTACK_SPEED, 3.0f)
                 .add(Attributes.FOLLOW_RANGE, 128.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.5)
-                .add(Attributes.FLYING_SPEED, 3.0)
+                .add(Attributes.MOVEMENT_SPEED, 2.0)
+                .add(Attributes.FLYING_SPEED, 12.0)
                 .build();
     }
 
@@ -289,7 +289,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.bossEvent.setOverlay(BossEvent.BossBarOverlay.NOTCHED_6);
             }
             if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
-                if (this.tickCount % 15 == 0) {
+                if (this.tickCount % 3 == 0) {
                     shootFiveWitherSkull();
                 }
             }
@@ -298,7 +298,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             if (cTick > 0) {
                 this.setCannonTick(cTick + 1);
                 this.getNavigation().stop();
-                if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
+                if (cTick >= 80 && cTick <= 150 && cTick % 2 == 0) {
                     shootWitherSkull();
                 }
                 if (cTick > CANNON_DUR) {

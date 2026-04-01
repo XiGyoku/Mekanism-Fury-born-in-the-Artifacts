@@ -49,12 +49,12 @@ public class RobyteAttackGoal extends Goal {
             mob.setYRot(targetYaw);
             mob.yHeadRot = targetYaw;
             mob.yBodyRot = targetYaw;
-            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.3D);
+            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(1.0D);
             if (mob.hurtTime == 0) {
                 mob.setDeltaMovement(dashVec);
             }
 
-            if (aTick % 5 == 0) {
+            if (aTick % 2 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
                     if (entity != mob && entity.isAlive()) {
                         float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
