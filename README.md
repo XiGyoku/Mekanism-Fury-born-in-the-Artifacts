@@ -1,3 +1,4 @@
+![Now Released on CurseForge!](https://www.curseforge.com/minecraft/mc-mods/mekanism-furyborn-in-the-artifacts)
 ![CurseForge Version](https://img.shields.io/curseforge/v/1500554)
 ![Minecraft Version](https://cf.way2muchnoise.eu/versions/1500554.svg)
 ![Curseforge Id](https://cf.way2muchnoise.eu/1500554.svg)
