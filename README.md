@@ -1,5 +1,4 @@
-![CurseForge Version](https://img.shields.io/curseforge/v/1500554?link=https%3A%2F%2Fwww.curseforge.com%2Fminecraft%2Fmc-mods%2Fmekanism-furyborn-in-the-artifacts)
-
+![CurseForge Version](https://img.shields.io/curseforge/v/1500554)![Minecraft Version](https://cf.way2muchnoise.eu/versions/1500554.svg)![Curseforge Id](https://cf.way2muchnoise.eu/1500554.svg)
 
 
 <img width="512" height="128" alt="mekribotibossixonbig" src="https://github.com/user-attachments/assets/6bfaac65-10f2-47eb-8c1e-6062d5432943" />
