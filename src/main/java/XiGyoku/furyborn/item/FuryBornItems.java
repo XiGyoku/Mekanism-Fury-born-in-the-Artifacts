@@ -39,6 +39,16 @@ public class FuryBornItems {
                         }
                     });
 
+    public static final RegistryObject<Item> NULL_DATA_MODEL =
+            Furyborn.ITEMS.register("null_datamodel",
+                    () -> new Item(new Item.Properties()) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.robit_datamodel_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
     public static final RegistryObject<Item> ROBYTE_DATA_MODEL =
             Furyborn.ITEMS.register("robyte_datamodel",
                     () -> new Item(new Item.Properties()) {

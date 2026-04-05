@@ -61,6 +61,7 @@ public class Furyborn {
         output.accept(FuryBornItems.ROBYTE_DATA_MODEL.get());
         output.accept(FuryBornItems.ROBIT_DATA_MODEL.get());
         output.accept(FuryBornItems.BUSTER_THROWER.get());
+        output.accept(FuryBornItems.NULL_DATA_MODEL.get());
         output.accept(FuryBornItems.HALO_OF_EXOLUMEN.get());
         output.accept(FuryBornItems.ROBYTE_SPAWN_EGG.get());
     }).build());

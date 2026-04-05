@@ -12,10 +12,12 @@
   "block.furyborn.t_supercomputer": "Supercomputer T",
   "item.furyborn.robit_datamodel": "Robit Data Model",
   "item.furyborn.robit_datamodel_desc": "A foundational data model. Contains recorded information of a Robit.",
+  "item.furyborn.null_datamodel": "Non-Being Data Model",
+  "item.furyborn.null_datamodel_desc": "A data model of something. An unknown darkness lurks behind the peeled label.",
   "item.furyborn.robyte_datamodel": "Overfitted Robit Data Model",
   "item.furyborn.robyte_datamodel_desc": "An overfitted data model of a Robit. Its internal data has mysteriously mutated.",
   "item.furyborn.buster_thrower": "Buster Thrower",
   "item.furyborn.buster_thrower_desc": "I won't die!",
-    "item.furyborn.halo_of_exolumen": "Halo of Exolumen",
+  "item.furyborn.halo_of_exolumen": "Halo of Exolumen",
   "effect.furyborn.monitored": "Monitored"
 }
