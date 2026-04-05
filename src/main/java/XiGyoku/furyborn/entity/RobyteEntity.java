@@ -374,6 +374,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             RobyteBitLaserEntity bit = new RobyteBitLaserEntity(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), this.level());
             bit.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
             bit.setOwner(this);
+            bit.setTarget(this.level().getNearestPlayer(this, 30.0));;
             this.level().addFreshEntity(bit);
         }
     }

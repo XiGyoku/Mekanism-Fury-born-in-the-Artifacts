@@ -58,6 +58,10 @@ public class FuryBornItems {
             Furyborn.ITEMS.register("buster_thrower",
                     () -> new ItemBusterThrower(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> HALO_OF_EXOLUMEN =
+            Furyborn.ITEMS.register("halo_of_exolumen",
+                    () -> new HaloOfExolumenItem(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus){
     }
 }

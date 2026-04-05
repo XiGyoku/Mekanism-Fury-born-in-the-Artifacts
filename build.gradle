@@ -190,6 +190,7 @@ dependencies {
     implementation fg.deobf("mekanism:Mekanism:1.20.1-10.4.16.80")
     implementation fg.deobf("curse.maven:emi-580555:6420945")
     implementation fg.deobf("curse.maven:tmrv-1194921:7785751")
+    implementation fg.deobf("curse.maven:curios-309927:6418456")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

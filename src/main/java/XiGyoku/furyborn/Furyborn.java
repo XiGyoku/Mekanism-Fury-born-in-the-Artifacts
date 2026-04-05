@@ -3,6 +3,7 @@ package XiGyoku.furyborn;
 import XiGyoku.furyborn.block.FuryBornBlocks;
 import XiGyoku.furyborn.client.entity.RobyteBitLaserRenderer;
 import XiGyoku.furyborn.client.entity.RobyteLaserRenderer;
+import XiGyoku.furyborn.client.item.HaloOfExolumenRenderer;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
@@ -37,6 +38,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 import software.bernie.geckolib.GeckoLib;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Furyborn.MODID)
@@ -59,6 +61,7 @@ public class Furyborn {
         output.accept(FuryBornItems.ROBYTE_DATA_MODEL.get());
         output.accept(FuryBornItems.ROBIT_DATA_MODEL.get());
         output.accept(FuryBornItems.BUSTER_THROWER.get());
+        output.accept(FuryBornItems.HALO_OF_EXOLUMEN.get());
         output.accept(FuryBornItems.ROBYTE_SPAWN_EGG.get());
     }).build());
 
@@ -126,6 +129,10 @@ public class Furyborn {
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_AREA.get(), RobyteAreaRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), RobyteBitLaserRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_LASER.get(), RobyteLaserRenderer::new);
+
+            event.enqueueWork(() -> {
+                CuriosRendererRegistry.register(FuryBornItems.HALO_OF_EXOLUMEN.get(), HaloOfExolumenRenderer::new);
+            });
         }
     }
 }

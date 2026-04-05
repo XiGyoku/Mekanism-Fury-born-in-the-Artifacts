@@ -3,6 +3,9 @@ package XiGyoku.furyborn.entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -18,6 +21,7 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class RobyteBitLaserEntity extends Entity {
+    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.FLOAT);
     private Vec3 startPos;
     private Vec3 targetPos;
     private int lifeTicks = 0;
@@ -28,6 +32,7 @@ public class RobyteBitLaserEntity extends Entity {
     private UUID ownerUUID;
     @Nullable
     private Entity cachedOwner;
+    private LivingEntity targetEntity;
 
     public RobyteBitLaserEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -35,7 +40,9 @@ public class RobyteBitLaserEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData() {
+        this.entityData.define(DAMAGE, 1.0F);
+    }
 
     public void setOwner(Entity owner) {
         if (owner != null) {
@@ -46,6 +53,14 @@ public class RobyteBitLaserEntity extends Entity {
 
     public UUID getOwnerUUID() {
         return this.ownerUUID;
+    }
+
+    public void setDamage(float damage) { this.entityData.set(DAMAGE, damage); }
+
+    public float getDamage() { return this.entityData.get(DAMAGE); }
+
+    public void setTarget(LivingEntity target) {
+        this.targetEntity = target;
     }
 
     public Entity getOwner() {
@@ -69,7 +84,7 @@ public class RobyteBitLaserEntity extends Entity {
             this.targetPos = this.startPos.add(Math.cos(angle) * 5.0, (this.random.nextDouble() * 4.0 - 2.0), Math.sin(angle) * 5.0);
         }
         if (lifeTicks < moveDuration) {
-            smoothLookAtPlayer();
+            smoothLookAtTarget();
             float t = (float) lifeTicks / moveDuration;
             double curX = Mth.lerp(t, this.startPos.x, this.targetPos.x);
             double curZ = Mth.lerp(t, this.startPos.z, this.targetPos.z);
@@ -91,7 +106,7 @@ public class RobyteBitLaserEntity extends Entity {
 
             laser.setRadius(0.15F);
             laser.setMaxLife(200);
-            laser.setDamage(1.0F);
+            laser.setDamage(this.getDamage());
             laser.setOwner(this);
             this.level().addFreshEntity(laser);
         }
@@ -102,11 +117,10 @@ public class RobyteBitLaserEntity extends Entity {
         lifeTicks++;
     }
 
-    private void smoothLookAtPlayer() {
-        Player player = this.level().getNearestPlayer(this, 30.0);
-        if (player != null) {
+    private void smoothLookAtTarget() {
+        if (this.targetEntity != null && this.targetEntity.isAlive()) {
             Vec3 pivot = new Vec3(this.getX(), this.getY() + 0.30D, this.getZ());
-            Vec3 diff = player.getEyePosition().subtract(pivot);
+            Vec3 diff = this.targetEntity.getEyePosition().subtract(pivot);
 
             float targetYaw = (float) (-Mth.atan2(diff.x, diff.z) * (180F / Math.PI));
             float targetPitch = (float) (-Mth.atan2(diff.y, diff.horizontalDistance()) * (180F / Math.PI));
@@ -118,12 +132,14 @@ public class RobyteBitLaserEntity extends Entity {
 
     @Override protected void readAdditionalSaveData(CompoundTag nbt) {
         lifeTicks = nbt.getInt("LifeTicks");
+        if (nbt.contains("Damage")) setDamage(nbt.getFloat("Damage"));
         if (nbt.hasUUID("Owner")) {
             this.ownerUUID = nbt.getUUID("Owner");
         }
     }
     @Override protected void addAdditionalSaveData(CompoundTag nbt) {
         nbt.putInt("LifeTicks", lifeTicks);
+        nbt.putFloat("Damage", getDamage());
         if (this.ownerUUID != null) {
             nbt.putUUID("Owner", this.ownerUUID);
         }
