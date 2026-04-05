@@ -13,5 +13,7 @@
   "item.furyborn.t_supercomputer_desc": "量子演算を行うスーパーコンピュータ。データモデルを処理することが出来る。",
   "item.furyborn.robit_datamodel_desc": "ロビットのデータモデル。ロビットの情報が記録されている。",
   "item.furyborn.robyte_datamodel_desc": "ロビットの過学習データモデル。保存された情報に変化が生じている。",
+  "item.furyborn.buster_thrower": "量子光線放射器",
+  "item.furyborn.buster_thrower_desc": "俺は死なない！",
   "effect.furyborn.monitored": "監視"
 }

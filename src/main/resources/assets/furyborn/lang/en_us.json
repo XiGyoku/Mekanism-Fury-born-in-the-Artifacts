@@ -13,5 +13,7 @@
   "item.furyborn.robit_datamodel_desc": "A foundational data model. Contains recorded information of a Robit.",
   "item.furyborn.robyte_datamodel": "Overfitted Robit Data Model",
   "item.furyborn.robyte_datamodel_desc": "An overfitted data model of a Robit. Its internal data has mysteriously mutated.",
+  "item.furyborn.buster_thrower": "Buster Thrower",
+  "item.furyborn.buster_thrower_desc": "I won't die!",
   "effect.furyborn.monitored": "Monitored"
 }
