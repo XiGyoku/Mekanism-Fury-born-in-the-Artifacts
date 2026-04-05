@@ -116,7 +116,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 400.0)
+                .add(Attributes.MAX_HEALTH, 2000.0)
                 .add(Attributes.ATTACK_DAMAGE, 4.0)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.FOLLOW_RANGE, 128.0)

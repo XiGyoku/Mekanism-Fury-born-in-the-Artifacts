@@ -91,6 +91,7 @@ public class RobyteBitLaserEntity extends Entity {
 
             laser.setRadius(0.15F);
             laser.setMaxLife(200);
+            laser.setDamage(1.0F);
             laser.setOwner(this);
             this.level().addFreshEntity(laser);
         }
