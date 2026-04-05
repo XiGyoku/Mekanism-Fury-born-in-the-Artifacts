@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:null_datamodel"
+    },
+    "title": {
+      "text": "Aftermath"
+    },
+    "description": {
+      "text": "虚空のデータモデルを手に入れた。一切正体不明だ。"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:kill_boss",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:null_datamodel"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

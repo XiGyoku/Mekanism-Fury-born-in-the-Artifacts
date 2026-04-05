@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:halo_of_exolumen"
+    },
+    "title": {
+      "text": "All in Exolumen"
+    },
+    "description": {
+      "text": "機星ノ赫輪を手に入れた。"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:null",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:halo_of_exolumen"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

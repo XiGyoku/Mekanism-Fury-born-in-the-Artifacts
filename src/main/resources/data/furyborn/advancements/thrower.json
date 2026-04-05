@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:buster_thrower"
+    },
+    "title": {
+      "text": "Operation Meteor"
+    },
+    "description": {
+      "text": "量子光線放射器を手に入れた。五飛、教えてくれ...俺はこれをどう使えばいい？"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:kill_boss",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:buster_thrower"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
