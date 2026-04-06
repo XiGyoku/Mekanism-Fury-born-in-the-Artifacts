@@ -3,6 +3,7 @@ package XiGyoku.furyborn.entity.AI;
 import XiGyoku.furyborn.entity.RobyteEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.sounds.SoundEvents;
@@ -19,14 +20,19 @@ public class RobyteAttackGoal extends Goal {
     @Override
     public boolean canUse() {
         return mob.getTarget() != null && mob.attackCooldown <= 0
-                && mob.getAttackTick() == 0 && mob.getCannonTick() == 0
+                && mob.getAttackTick() == 0 && mob.getCannonTick() == 0 && mob.getTransamTick() == 0
                 && mob.phaseTransitionTick == 0
                 && !mob.hasEnteredFinalPhase();
     }
 
     @Override
     public void start() {
-        if (mob.getRandom().nextBoolean()) {
+        mob.actionCount++;
+        if (mob.actionCount % 10 == 0 && mob.transamCooldown <= 0) {
+            mob.setTransamTick(1);
+            mob.setTransamMode(true);
+            mob.transamCooldown = 400;
+        } else if (mob.getRandom().nextBoolean()) {
             mob.setAttackTick(1);
         } else {
             mob.setCannonTick(1);
@@ -40,8 +46,66 @@ public class RobyteAttackGoal extends Goal {
 
         mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
+        int tTick = mob.getTransamTick();
         int aTick = mob.getAttackTick();
-        if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
+
+        if (tTick > 0) {
+            if (tTick <= 120) {
+                mob.getNavigation().stop();
+                if (mob.hurtTime == 0) {
+                    mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.5D, 0.5D, 0.5D));
+                }
+                mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
+            } else {
+                int spinTick = tTick - 120;
+                if (spinTick > mob.ROTATION_START_DUR && spinTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
+                    double dx = target.getX() - mob.getX();
+                    double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
+                    double dz = target.getZ() - mob.getZ();
+                    float targetYaw = (float)(Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+                    mob.setYRot(targetYaw);
+                    mob.yHeadRot = targetYaw;
+                    mob.yBodyRot = targetYaw;
+                    net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.6D);
+                    if (mob.hurtTime == 0) {
+                        mob.setDeltaMovement(dashVec);
+                    }
+
+                    if (spinTick % 5 == 0) {
+                        mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
+                            if (entity != mob && entity.isAlive()) {
+                                entity.invulnerableTime = 0;
+                                entity.hurtTime = 0;
+
+                                if (entity instanceof Player player && player.isBlocking()) {
+                                    player.disableShield(true);
+                                }
+
+                                float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                                boolean hasHit = entity.hurt(mob.damageSources().mobAttack(mob), damage);
+
+                                if (!hasHit) {
+                                    hasHit = entity.hurt(mob.damageSources().indirectMagic(mob, mob), damage);
+                                }
+
+                                if (hasHit) {
+                                    mob.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.5F);
+                                    double d0 = entity.getX() - mob.getX();
+                                    double d2 = entity.getZ() - mob.getZ();
+                                    entity.knockback(0.4D, d0, d2);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    mob.getNavigation().stop();
+                    if (mob.hurtTime == 0) {
+                        mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.5D, 0.5D, 0.5D));
+                    }
+                    mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
+                }
+            }
+        } else if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
             double dx = target.getX() - mob.getX();
             double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
             double dz = target.getZ() - mob.getZ();
@@ -81,7 +145,7 @@ public class RobyteAttackGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return (mob.getAttackTick() > 0 || mob.getCannonTick() > 0) && mob.phaseTransitionTick == 0;
+        return (mob.getAttackTick() > 0 || mob.getCannonTick() > 0 || mob.getTransamTick() > 0) && mob.phaseTransitionTick == 0;
     }
 
     @Override

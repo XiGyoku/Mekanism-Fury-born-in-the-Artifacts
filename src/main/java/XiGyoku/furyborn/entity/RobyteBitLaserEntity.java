@@ -21,7 +21,9 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class RobyteBitLaserEntity extends Entity {
-    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RobyteBitLaserEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> PREDICT_FUTURE = SynchedEntityData.defineId(RobyteBitLaserEntity.class, EntityDataSerializers.BOOLEAN);
+
     private Vec3 startPos;
     private Vec3 targetPos;
     private int lifeTicks = 0;
@@ -42,6 +44,7 @@ public class RobyteBitLaserEntity extends Entity {
     @Override
     protected void defineSynchedData() {
         this.entityData.define(DAMAGE, 1.0F);
+        this.entityData.define(PREDICT_FUTURE, false);
     }
 
     public void setOwner(Entity owner) {
@@ -58,6 +61,14 @@ public class RobyteBitLaserEntity extends Entity {
     public void setDamage(float damage) { this.entityData.set(DAMAGE, damage); }
 
     public float getDamage() { return this.entityData.get(DAMAGE); }
+
+    public void setMode(boolean predictFuture) {
+        this.entityData.set(PREDICT_FUTURE, predictFuture);
+    }
+
+    public boolean isPredictFutureMode() {
+        return this.entityData.get(PREDICT_FUTURE);
+    }
 
     public void setTarget(LivingEntity target) {
         this.targetEntity = target;
@@ -120,7 +131,13 @@ public class RobyteBitLaserEntity extends Entity {
     private void smoothLookAtTarget() {
         if (this.targetEntity != null && this.targetEntity.isAlive()) {
             Vec3 pivot = new Vec3(this.getX(), this.getY() + 0.30D, this.getZ());
-            Vec3 diff = this.targetEntity.getEyePosition().subtract(pivot);
+            Vec3 targetEyePos = this.targetEntity.getEyePosition();
+            if (this.isPredictFutureMode()) {
+                Vec3 velocity = this.targetEntity.getDeltaMovement();
+                targetEyePos = targetEyePos.add(velocity.scale(100.0D));
+            }
+
+            Vec3 diff = targetEyePos.subtract(pivot);
 
             float targetYaw = (float) (-Mth.atan2(diff.x, diff.z) * (180F / Math.PI));
             float targetPitch = (float) (-Mth.atan2(diff.y, diff.horizontalDistance()) * (180F / Math.PI));
@@ -136,13 +153,18 @@ public class RobyteBitLaserEntity extends Entity {
         if (nbt.hasUUID("Owner")) {
             this.ownerUUID = nbt.getUUID("Owner");
         }
+        if (nbt.contains("PredictFuture")) {
+            setMode(nbt.getBoolean("PredictFuture"));
+        }
     }
+
     @Override protected void addAdditionalSaveData(CompoundTag nbt) {
         nbt.putInt("LifeTicks", lifeTicks);
         nbt.putFloat("Damage", getDamage());
         if (this.ownerUUID != null) {
             nbt.putUUID("Owner", this.ownerUUID);
         }
+        nbt.putBoolean("PredictFuture", isPredictFutureMode());
     }
 
     @Override

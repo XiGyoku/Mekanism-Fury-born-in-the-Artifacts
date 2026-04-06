@@ -48,6 +48,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> ATTACK_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CANNON_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ENTERED_FINAL_PHASE = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> TRANSAM_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> IS_TRANSAM = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.BOOLEAN);
+
     private final ServerBossEvent bossEvent = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -66,6 +69,10 @@ public class RobyteEntity extends Monster implements GeoEntity {
     private RobyteAreaEntity cachedArea = null;
     public int teleportCooldown = 0;
     private boolean hasStartedClientBgm = false;
+
+    public int transamCooldown = 0;
+    public int finalPhaseLaserTick = 0;
+    public int actionCount = 0;
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -88,6 +95,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
         this.entityData.define(ATTACK_TICK, 0);
         this.entityData.define(CANNON_TICK, 0);
         this.entityData.define(ENTERED_FINAL_PHASE, false);
+        this.entityData.define(TRANSAM_TICK, 0);
+        this.entityData.define(IS_TRANSAM, false);
     }
 
     public int getAttackTick() {
@@ -112,6 +121,22 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public void setEnteredFinalPhase(boolean phase) {
         this.entityData.set(ENTERED_FINAL_PHASE, phase);
+    }
+
+    public int getTransamTick() {
+        return this.entityData.get(TRANSAM_TICK);
+    }
+
+    public void setTransamTick(int tick) {
+        this.entityData.set(TRANSAM_TICK, tick);
+    }
+
+    public boolean isTransamMode() {
+        return this.entityData.get(IS_TRANSAM);
+    }
+
+    public void setTransamMode(boolean mode) {
+        this.entityData.set(IS_TRANSAM, mode);
     }
 
     public static AttributeSupplier createAttributes() {
@@ -169,6 +194,23 @@ public class RobyteEntity extends Monster implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
+        int currentTransamTick = this.getTransamTick();
+        if (currentTransamTick > 0) {
+            if (currentTransamTick <= 120) {
+                state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackStart"));
+            } else {
+                int spinTick = currentTransamTick - 120;
+                if (spinTick <= ROTATION_START_DUR) {
+                    state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackStart"));
+                } else if (spinTick <= ROTATION_START_DUR + ROTATION_LOOP_DUR) {
+                    state.getController().setAnimation(RawAnimation.begin().thenLoop("RotationAttack"));
+                } else {
+                    state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackEnd"));
+                }
+            }
+            return PlayState.CONTINUE;
+        }
+
         int currentAttackTick = this.getAttackTick();
         if (currentAttackTick > 0) {
             if (currentAttackTick <= ROTATION_START_DUR) {
@@ -221,7 +263,43 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 ClientSoundHelper.playRobyteBgm(this);
                 this.hasStartedClientBgm = true;
             }
+
+            if (this.isTransamMode()) {
+                for (int i = 0; i < 1; i++) {
+                    double px = this.getX() + (this.random.nextDouble() - 0.5) * 4.0;
+                    double py = this.getY() + this.random.nextDouble() * 3.0;
+                    double pz = this.getZ() + (this.random.nextDouble() - 0.5) * 4.0;
+                    this.level().addParticle(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, px, py, pz, 0.0D, 0.0D, 0.0D);
+                }
+            }
+
+            int tTick = this.getTransamTick();
+            if (tTick > 0 && tTick <= 120) {
+                double radius = 10.0D;
+                double beamLength = 100.0D;
+                double progress = (double) tTick / 120.0;
+                double currentZDist = progress * beamLength;
+                net.minecraft.world.phys.Vec3 start = this.getEyePosition();
+
+                for (int angleDeg = 0; angleDeg < 360; angleDeg += 30) {
+                    double rad = Math.toRadians(angleDeg);
+                    double pitchRad = Math.toRadians(-30.0);
+                    net.minecraft.world.phys.Vec3 look = new net.minecraft.world.phys.Vec3(Math.sin(rad) * Math.cos(pitchRad), -Math.sin(pitchRad), Math.cos(rad) * Math.cos(pitchRad));
+                    net.minecraft.world.phys.Vec3 up = new net.minecraft.world.phys.Vec3(0, 1, 0);
+                    net.minecraft.world.phys.Vec3 right = look.cross(up).normalize();
+                    net.minecraft.world.phys.Vec3 beamUp = right.cross(look).normalize();
+
+                    int particlesPerTick = 5;
+                    for (int i = 0; i < particlesPerTick; i++) {
+                        double angle = (tTick * 2.0) + (i * Math.PI * 2 / particlesPerTick);
+                        net.minecraft.world.phys.Vec3 offset = right.scale(Math.cos(angle) * radius).add(beamUp.scale(Math.sin(angle) * radius));
+                        net.minecraft.world.phys.Vec3 particlePos = start.add(look.scale(currentZDist)).add(offset);
+                        this.level().addParticle(net.minecraft.core.particles.ParticleTypes.FLAME, particlePos.x, particlePos.y, particlePos.z, 0.0D, 0.0D, 0.0D);
+                    }
+                }
+            }
         }
+
         if (!this.level().isClientSide()) {
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
             if (!this.hasSummonedArea) {
@@ -241,102 +319,168 @@ public class RobyteEntity extends Monster implements GeoEntity {
             }
 
             if (this.tickCount >= 40) {
-            if (this.teleportCooldown > 0) {
-                this.teleportCooldown--;
-            }
-            LivingEntity target = this.getTarget();
-            if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
-                if (this.cachedArea != null && this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
-                    float yRot = player.getYRot();
-                    double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
-                    double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
-
-                    double targetX = player.getX() + offsetX;
-                    double targetY = player.getY() + 1.0;
-                    double targetZ = player.getZ() + offsetZ;
-
-                    this.teleportTo(targetX, targetY, targetZ);
-                    this.lookAt(player, 30.0F, 30.0F);
-                    this.setYRot(player.getYRot());
-
-                    this.playSound(FuryBornSounds.ROBYTE_TELEPORT.get(), 1.0F, 1.0F);
-                    this.teleportCooldown = 400;
+                if (this.teleportCooldown > 0) {
+                    this.teleportCooldown--;
                 }
-            }
-            if (!this.isDeadOrDying() && this.cachedArea != null) {
+                if (this.transamCooldown > 0) {
+                    this.transamCooldown--;
+                }
+                LivingEntity target = this.getTarget();
+                if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
+                    if (this.cachedArea != null && this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
+                        float yRot = player.getYRot();
+                        double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
+                        double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
+
+                        double targetX = player.getX() + offsetX;
+                        double targetY = player.getY() + 1.0;
+                        double targetZ = player.getZ() + offsetZ;
+
+                        this.teleportTo(targetX, targetY, targetZ);
+                        this.lookAt(player, 30.0F, 30.0F);
+                        this.setYRot(player.getYRot());
+
+                        this.playSound(FuryBornSounds.ROBYTE_TELEPORT.get(), 1.0F, 1.0F);
+                        this.teleportCooldown = 400;
+                    }
+                }
                 if (!this.isDeadOrDying() && this.cachedArea != null) {
-                    if (!this.cachedArea.isEntityInsideArea(this)) {
-                        double dx = this.cachedArea.getX() - this.getX();
-                        double dz = this.cachedArea.getZ() - this.getZ();
-                        double length = Math.sqrt(dx * dx + dz * dz);
-                        if (length > 0) {
-                            double pushForce = 0.5;
-                            this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
+                    if (!this.isDeadOrDying() && this.cachedArea != null) {
+                        if (!this.cachedArea.isEntityInsideArea(this)) {
+                            double dx = this.cachedArea.getX() - this.getX();
+                            double dz = this.cachedArea.getZ() - this.getZ();
+                            double length = Math.sqrt(dx * dx + dz * dz);
+                            if (length > 0) {
+                                double pushForce = 0.5;
+                                this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
+                            }
+                            if (this.getY() > this.cachedArea.getY() + 60.0) {
+                                this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
+                            } else if (this.getY() < this.cachedArea.getY() - 2.0) {
+                                this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
+                            }
                         }
-                        if (this.getY() > this.cachedArea.getY() + 60.0) {
-                            this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
-                        } else if (this.getY() < this.cachedArea.getY() - 2.0) {
-                            this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
-                        }
                     }
                 }
-            }
-            if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
-                this.setEnteredFinalPhase(true);
-                this.phaseTransitionTick = 1;
-                this.setAttackTick(0);
-                this.setCannonTick(0);
-                this.bossEvent.setColor(BossEvent.BossBarColor.GREEN);
-                this.bossEvent.setOverlay(BossEvent.BossBarOverlay.NOTCHED_6);
-            }
-            if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
-                if (this.tickCount % 15 == 0) {
-                    shootFiveWitherSkull();
-                    for (int i = 0; i < 5; i++) {
-                        this.summonBitLaser();
-                    }
-                }
-            }
-
-            int cTick = this.getCannonTick();
-            if (cTick > 0) {
-                this.setCannonTick(cTick + 1);
-                this.getNavigation().stop();
-                if (cTick <= 150) {
-                    if (cTick % 20 == 0) {
-                        this.summonBitLaser();
-                    }
-                }
-                if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
-                    shootWitherSkull();
-                }
-                if (cTick > CANNON_DUR) {
-                    this.setCannonTick(0);
-                    this.attackCooldown = 20;
-                }
-            }
-
-            int aTick = this.getAttackTick();
-            if (aTick > 0) {
-                this.setAttackTick(aTick + 1);
-                if (aTick > ROTATION_TOTAL_ATTACK_DUR) {
+                if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
+                    this.setEnteredFinalPhase(true);
+                    this.phaseTransitionTick = 1;
                     this.setAttackTick(0);
-                    this.attackCooldown = 20;
+                    this.setCannonTick(0);
+                    this.setTransamTick(0);
+                    this.setTransamMode(false);
+                    this.bossEvent.setColor(BossEvent.BossBarColor.GREEN);
+                    this.bossEvent.setOverlay(BossEvent.BossBarOverlay.NOTCHED_6);
                 }
-            }
+                if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
+                    this.finalPhaseLaserTick++;
+                    if (this.finalPhaseLaserTick >= 400) {
+                        this.finalPhaseLaserTick = 0;
+                        this.shootBigLaserAtPlayer();
+                    }
 
-            if (this.phaseTransitionTick > 0) {
-                this.phaseTransitionTick++;
-                this.getNavigation().stop();
-                if (this.phaseTransitionTick > PHASE_TRANSITION_DUR) {
-                    this.phaseTransitionTick = 0;
+                    if (this.tickCount % 15 == 0) {
+                        shootFiveWitherSkull();
+                        for (int i = 0; i < 5; i++) {
+                            this.summonBitLaser();
+                        }
+                    }
+                    if(this.tickCount % 200 == 0) {
+                        for (int i = 0; i < 5; i++) {
+                            this.summonPredictBitLaser();
+                        }
+                    }
                 }
-            }
 
-            if (this.attackCooldown > 0) {
-                this.attackCooldown--;
+                int tTick = this.getTransamTick();
+                if (tTick > 0) {
+                    this.setTransamTick(tTick + 1);
+                    if (tTick == 120) {
+                        for (int i = 0; i < 360; i += 30) {
+                            RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+                            laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                            laser.setYRot(i);
+                            laser.setXRot(-30.0F);
+                            laser.setRadius(10.0F);
+                            laser.setMaxLife(400);
+                            laser.setDamage(0.5F);
+                            laser.setOwner(this);
+                            this.level().addFreshEntity(laser);
+                        }
+                    }
+                    if (tTick % 100 == 0) {
+                        this.summonBitLaser();
+                        this.summonPredictBitLaser();
+                    }
+                    if (tTick > 120 + ROTATION_TOTAL_ATTACK_DUR) {
+                        this.setTransamTick(0);
+                        this.setTransamMode(false);
+                        this.attackCooldown = 20;
+                    }
+                }
+
+                int cTick = this.getCannonTick();
+                if (cTick > 0) {
+                    this.setCannonTick(cTick + 1);
+                    this.getNavigation().stop();
+                    if (cTick <= 150) {
+                        if (cTick % 20 == 0) {
+                            this.summonBitLaser();
+                        }
+                        if (cTick % 100 == 0) {
+                            this.summonPredictBitLaser();
+                        }
+                    }
+                    if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
+                        shootWitherSkull();
+                    }
+                    if (cTick > CANNON_DUR) {
+                        this.setCannonTick(0);
+                        this.attackCooldown = 20;
+                    }
+                }
+
+                int aTick = this.getAttackTick();
+                if (aTick > 0) {
+                    this.setAttackTick(aTick + 1);
+                    if (aTick > ROTATION_TOTAL_ATTACK_DUR) {
+                        this.setAttackTick(0);
+                        this.attackCooldown = 20;
+                    }
+                }
+
+                if (this.phaseTransitionTick > 0) {
+                    this.phaseTransitionTick++;
+                    this.getNavigation().stop();
+                    if (this.phaseTransitionTick > PHASE_TRANSITION_DUR) {
+                        this.phaseTransitionTick = 0;
+                    }
+                }
+
+                if (this.attackCooldown > 0) {
+                    this.attackCooldown--;
+                }
             }
         }
+    }
+
+    private void shootBigLaserAtPlayer() {
+        LivingEntity target = this.getTarget();
+        if (target != null) {
+            RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+            laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+            double dx = target.getX() - this.getX();
+            double dy = target.getEyeY() - laser.getY();
+            double dz = target.getZ() - this.getZ();
+            float targetYaw = (float)(net.minecraft.util.Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+            float targetPitch = (float)(-(net.minecraft.util.Mth.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180F / Math.PI)));
+            laser.setYRot(targetYaw);
+            laser.setXRot(targetPitch);
+            laser.setRadius(10.0F);
+            laser.setMaxLife(400);
+            laser.setDamage(0.5F);
+            laser.setOwner(this);
+            this.level().addFreshEntity(laser);
         }
     }
 
@@ -374,7 +518,18 @@ public class RobyteEntity extends Monster implements GeoEntity {
             RobyteBitLaserEntity bit = new RobyteBitLaserEntity(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), this.level());
             bit.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
             bit.setOwner(this);
-            bit.setTarget(this.level().getNearestPlayer(this, 30.0));;
+            bit.setTarget(this.level().getNearestPlayer(this, 30.0));
+            this.level().addFreshEntity(bit);
+        }
+    }
+
+    private void summonPredictBitLaser() {
+        if (!this.level().isClientSide) {
+            RobyteBitLaserEntity bit = new RobyteBitLaserEntity(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), this.level());
+            bit.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+            bit.setOwner(this);
+            bit.setTarget(this.level().getNearestPlayer(this, 30.0));
+            bit.setMode(true);
             this.level().addFreshEntity(bit);
         }
     }
@@ -495,6 +650,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("HasSummonedArea", this.hasSummonedArea);
+        compoundTag.putInt("TransamCooldown", this.transamCooldown);
+        compoundTag.putInt("ActionCount", this.actionCount);
     }
 
     @Override
@@ -502,6 +659,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
         super.readAdditionalSaveData(compoundTag);
         if (compoundTag.contains("HasSummonedArea")) {
             this.hasSummonedArea = compoundTag.getBoolean("HasSummonedArea");
+        }
+        if (compoundTag.contains("TransamCooldown")) {
+            this.transamCooldown = compoundTag.getInt("TransamCooldown");
+        }
+        if (compoundTag.contains("ActionCount")) {
+            this.actionCount = compoundTag.getInt("ActionCount");
         }
     }
 }
