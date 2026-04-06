@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "HEL",
+    "BPF",
+    "CGC"
+  ],
+  "key": {
+    "O": {
+      "item": "mekanism:mekasuit_helmet"
+    },
+    "B": {
+      "item": "mekanism:mekasuit_bodyarmor"
+    },
+    "L": {
+      "item": "mekanism:mekasuit_pants"
+    },
+    "F": {
+      "item": "mekanism:mekasuit_boots"
+    },
+    "E": {
+      "item": "mekanism:hdpe_elytra"
+    },
+    "P": {
+      "item": "furyborn:null_datamodel"
+    },
+    "G": {
+      "item": "mekanism:gravitational_modulating_unit"
+    },
+    "U": {
+      "item": "mekanism:energy_upgrade"
+    },
+    "C": {
+      "item": "mekanism:creative_energy_cube"
+    }
+  },
+  "result": {
+    "item": "furyborn:halo_of_exolumen"
+  }
+}
