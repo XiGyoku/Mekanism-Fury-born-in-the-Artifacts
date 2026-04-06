@@ -51,6 +51,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> TRANSAM_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> IS_TRANSAM = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> FINAL_LASER_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> FINAL_LASER_X = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> FINAL_LASER_Y = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> FINAL_LASER_Z = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> FINAL_LASER_YAW = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> FINAL_LASER_PITCH = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
 
     private final ServerBossEvent bossEvent = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
@@ -98,6 +103,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
         this.entityData.define(TRANSAM_TICK, 0);
         this.entityData.define(IS_TRANSAM, false);
         this.entityData.define(FINAL_LASER_TICK, 0);
+        this.entityData.define(FINAL_LASER_X, 0.0F);
+        this.entityData.define(FINAL_LASER_Y, 0.0F);
+        this.entityData.define(FINAL_LASER_Z, 0.0F);
+        this.entityData.define(FINAL_LASER_YAW, 0.0F);
+        this.entityData.define(FINAL_LASER_PITCH, 0.0F);
     }
 
     public int getAttackTick() {
@@ -146,6 +156,46 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public void setFinalLaserTick(int tick) {
         this.entityData.set(FINAL_LASER_TICK, tick);
+    }
+
+    public float getFinalLaserX() {
+        return this.entityData.get(FINAL_LASER_X);
+    }
+
+    public void setFinalLaserX(float v) {
+        this.entityData.set(FINAL_LASER_X, v);
+    }
+
+    public float getFinalLaserY() {
+        return this.entityData.get(FINAL_LASER_Y);
+    }
+
+    public void setFinalLaserY(float v) {
+        this.entityData.set(FINAL_LASER_Y, v);
+    }
+
+    public float getFinalLaserZ() {
+        return this.entityData.get(FINAL_LASER_Z);
+    }
+
+    public void setFinalLaserZ(float v) {
+        this.entityData.set(FINAL_LASER_Z, v);
+    }
+
+    public float getFinalLaserYaw() {
+        return this.entityData.get(FINAL_LASER_YAW);
+    }
+
+    public void setFinalLaserYaw(float v) {
+        this.entityData.set(FINAL_LASER_YAW, v);
+    }
+
+    public float getFinalLaserPitch() {
+        return this.entityData.get(FINAL_LASER_PITCH);
+    }
+
+    public void setFinalLaserPitch(float v) {
+        this.entityData.set(FINAL_LASER_PITCH, v);
     }
 
     public static AttributeSupplier createAttributes() {
@@ -316,8 +366,16 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 double progress = (double) pTick / 120.0;
                 double currentZDist = progress * beamLength;
 
-                net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getX(), this.getY() + 0.5D, this.getZ());
-                net.minecraft.world.phys.Vec3 look = this.getViewVector(1.0F);
+                net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getFinalLaserX(), this.getFinalLaserY(), this.getFinalLaserZ());
+
+                float pitch = this.getFinalLaserPitch();
+                float yaw = this.getFinalLaserYaw();
+                float f = net.minecraft.util.Mth.cos(-yaw * ((float)Math.PI / 180F) - (float)Math.PI);
+                float f1 = net.minecraft.util.Mth.sin(-yaw * ((float)Math.PI / 180F) - (float)Math.PI);
+                float f2 = -net.minecraft.util.Mth.cos(-pitch * ((float)Math.PI / 180F));
+                float f3 = net.minecraft.util.Mth.sin(-pitch * ((float)Math.PI / 180F));
+                net.minecraft.world.phys.Vec3 look = new net.minecraft.world.phys.Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
+
                 net.minecraft.world.phys.Vec3 up = new net.minecraft.world.phys.Vec3(0, 1, 0);
                 if (Math.abs(look.y) > 0.99) up = new net.minecraft.world.phys.Vec3(1, 0, 0);
                 net.minecraft.world.phys.Vec3 right = look.cross(up).normalize();
@@ -409,13 +467,21 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
                     int fTick = this.getFinalLaserTick() + 1;
 
-                    if (fTick > 280 && fTick <= 400 && target != null) {
-                        this.getLookControl().setLookAt(target, 30.0F, 30.0F);
+                    if (fTick == 281 && target != null) {
+                        this.setFinalLaserX((float)this.getX());
+                        this.setFinalLaserY((float)(this.getY() + 0.5D));
+                        this.setFinalLaserZ((float)this.getZ());
+
                         double dx = target.getX() - this.getX();
                         double dy = target.getEyeY() - (this.getY() + 0.5D);
                         double dz = target.getZ() - this.getZ();
                         float targetYaw = (float)(net.minecraft.util.Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
                         float targetPitch = (float)(-(net.minecraft.util.Mth.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180F / Math.PI)));
+
+                        this.setFinalLaserYaw(targetYaw);
+                        this.setFinalLaserPitch(targetPitch);
+
+                        this.getLookControl().setLookAt(target, 30.0F, 30.0F);
                         this.setYRot(targetYaw);
                         this.setXRot(targetPitch);
                         this.yHeadRot = targetYaw;
@@ -514,23 +580,15 @@ public class RobyteEntity extends Monster implements GeoEntity {
     }
 
     private void shootBigLaserAtPlayer() {
-        LivingEntity target = this.getTarget();
-        if (target != null) {
-            RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
-            laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
-            double dx = target.getX() - this.getX();
-            double dy = target.getEyeY() - laser.getY();
-            double dz = target.getZ() - this.getZ();
-            float targetYaw = (float)(net.minecraft.util.Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
-            float targetPitch = (float)(-(net.minecraft.util.Mth.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180F / Math.PI)));
-            laser.setYRot(targetYaw);
-            laser.setXRot(targetPitch);
-            laser.setRadius(10.0F);
-            laser.setMaxLife(400);
-            laser.setDamage(0.5F);
-            laser.setOwner(this);
-            this.level().addFreshEntity(laser);
-        }
+        RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+        laser.setPos(this.getFinalLaserX(), this.getFinalLaserY(), this.getFinalLaserZ());
+        laser.setYRot(this.getFinalLaserYaw());
+        laser.setXRot(this.getFinalLaserPitch());
+        laser.setRadius(10.0F);
+        laser.setMaxLife(400);
+        laser.setDamage(0.5F);
+        laser.setOwner(this);
+        this.level().addFreshEntity(laser);
     }
 
     private void shootWitherSkull() {
