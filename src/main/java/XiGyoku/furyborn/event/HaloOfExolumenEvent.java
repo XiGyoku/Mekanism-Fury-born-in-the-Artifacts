@@ -1,6 +1,9 @@
 package XiGyoku.furyborn.event;
 
 import XiGyoku.furyborn.item.HaloOfExolumenItem;
+import XiGyoku.furyborn.sound.FuryBornSounds;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -45,17 +48,21 @@ public class HaloOfExolumenEvent {
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
-        if (entity.level().isClientSide) return;
-
-        if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof HaloOfExolumenItem, entity).isPresent()) {
-            if (!event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-                event.setCanceled(true);
-
-                entity.setHealth(entity.getMaxHealth());
-                entity.removeAllEffects();
-
-                entity.level().broadcastEntityEvent(entity, (byte) 35);
+        if (entity.level().isClientSide()) return;
+        CuriosApi.getCuriosHelper().findFirstCurio(entity, stack -> stack.getItem() instanceof HaloOfExolumenItem).ifPresent(curio -> {
+            event.setCanceled(true);
+            entity.setHealth(entity.getMaxHealth());
+            entity.removeAllEffects();
+            for (int i = 0; i < 20; i++) {
+                entity.level().addParticle(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, entity.getX(), entity.getY(), entity.getZ(), 0.0D, 0.0D, 0.0D);
             }
-        }
+            entity.level().playSound(
+                    null,
+                    entity.getX(), entity.getY(), entity.getZ(),
+                    FuryBornSounds.ROBYTE_BEAMEND.get(),
+                    SoundSource.PLAYERS,
+                    2.0F, 1.0F
+            );
+        });
     }
 }

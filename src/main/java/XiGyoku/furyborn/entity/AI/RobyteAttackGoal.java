@@ -21,6 +21,7 @@ public class RobyteAttackGoal extends Goal {
     public boolean canUse() {
         return mob.getTarget() != null && mob.attackCooldown <= 0
                 && mob.getAttackTick() == 0 && mob.getCannonTick() == 0 && mob.getTransamTick() == 0
+                && mob.getAllRangeTick() == 0
                 && mob.phaseTransitionTick == 0
                 && !mob.hasEnteredFinalPhase();
     }
@@ -32,10 +33,18 @@ public class RobyteAttackGoal extends Goal {
             mob.setTransamTick(1);
             mob.setTransamMode(true);
             mob.transamCooldown = 400;
-        } else if (mob.getRandom().nextBoolean()) {
-            mob.setAttackTick(1);
         } else {
-            mob.setCannonTick(1);
+            boolean canUseAllRange = mob.getHealth() <= mob.getMaxHealth() * 0.5F && !mob.hasEnteredFinalPhase();
+            int maxRandom = canUseAllRange ? 3 : 2;
+            int r = mob.getRandom().nextInt(maxRandom);
+
+            if (r == 0) {
+                mob.setAttackTick(1);
+            } else if (r == 1) {
+                mob.setCannonTick(1);
+            } else {
+                mob.setAllRangeTick(1);
+            }
         }
     }
 
@@ -133,8 +142,7 @@ public class RobyteAttackGoal extends Goal {
                 });
             }
         }
-
-        if (mob.getCannonTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR))) {
+        if (mob.getCannonTick() > 0 || mob.getAllRangeTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR))) {
             mob.getNavigation().stop();
             if (mob.hurtTime == 0) {
                 mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.5D, 0.5D, 0.5D));
@@ -145,7 +153,7 @@ public class RobyteAttackGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return (mob.getAttackTick() > 0 || mob.getCannonTick() > 0 || mob.getTransamTick() > 0) && mob.phaseTransitionTick == 0;
+        return (mob.getAttackTick() > 0 || mob.getCannonTick() > 0 || mob.getTransamTick() > 0 || mob.getAllRangeTick() > 0) && mob.phaseTransitionTick == 0;
     }
 
     @Override

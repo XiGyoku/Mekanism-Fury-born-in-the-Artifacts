@@ -56,6 +56,10 @@ public class RobyteEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Float> FINAL_LASER_Z = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> FINAL_LASER_YAW = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> FINAL_LASER_PITCH = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> ALL_RANGE_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
+
+    private static final EntityDataAccessor<Float> ALL_RANGE_TRACK_YAW = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> ALL_RANGE_TRACK_PITCH = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
 
     private final ServerBossEvent bossEvent = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
@@ -71,6 +75,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public final int PHASE_TRANSITION_DUR = 60;
     public final int CANNON_DUR = 280;
 
+    public final int ALL_RANGE_START_DUR = 60;
+    public final int ALL_RANGE_LOOP_DUR = 200;
+    public final int ALL_RANGE_END_DUR = 80;
+    public final int ALL_RANGE_TOTAL_DUR = ALL_RANGE_START_DUR + ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR;
+
     private boolean hasSummonedArea = false;
     private RobyteAreaEntity cachedArea = null;
     public int teleportCooldown = 0;
@@ -78,6 +87,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public int transamCooldown = 0;
     public int actionCount = 0;
+
+    private final java.util.List<RobyteLaserEntity> allRangeSmallLasers = new java.util.ArrayList<>();
+    private final java.util.List<Float> smallLaserInitialYaws = new java.util.ArrayList<>();
+    private final java.util.List<Float> smallLaserInitialPitches = new java.util.ArrayList<>();
+    private RobyteLaserEntity allRangeBigLaser = null;
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -108,95 +122,39 @@ public class RobyteEntity extends Monster implements GeoEntity {
         this.entityData.define(FINAL_LASER_Z, 0.0F);
         this.entityData.define(FINAL_LASER_YAW, 0.0F);
         this.entityData.define(FINAL_LASER_PITCH, 0.0F);
+        this.entityData.define(ALL_RANGE_TICK, 0);
+        this.entityData.define(ALL_RANGE_TRACK_YAW, 0.0F);
+        this.entityData.define(ALL_RANGE_TRACK_PITCH, 0.0F);
     }
 
-    public int getAttackTick() {
-        return this.entityData.get(ATTACK_TICK);
-    }
-
-    public void setAttackTick(int tick) {
-        this.entityData.set(ATTACK_TICK, tick);
-    }
-
-    public int getCannonTick() {
-        return this.entityData.get(CANNON_TICK);
-    }
-
-    public void setCannonTick(int tick) {
-        this.entityData.set(CANNON_TICK, tick);
-    }
-
-    public boolean hasEnteredFinalPhase() {
-        return this.entityData.get(ENTERED_FINAL_PHASE);
-    }
-
-    public void setEnteredFinalPhase(boolean phase) {
-        this.entityData.set(ENTERED_FINAL_PHASE, phase);
-    }
-
-    public int getTransamTick() {
-        return this.entityData.get(TRANSAM_TICK);
-    }
-
-    public void setTransamTick(int tick) {
-        this.entityData.set(TRANSAM_TICK, tick);
-    }
-
-    public boolean isTransamMode() {
-        return this.entityData.get(IS_TRANSAM);
-    }
-
-    public void setTransamMode(boolean mode) {
-        this.entityData.set(IS_TRANSAM, mode);
-    }
-
-    public int getFinalLaserTick() {
-        return this.entityData.get(FINAL_LASER_TICK);
-    }
-
-    public void setFinalLaserTick(int tick) {
-        this.entityData.set(FINAL_LASER_TICK, tick);
-    }
-
-    public float getFinalLaserX() {
-        return this.entityData.get(FINAL_LASER_X);
-    }
-
-    public void setFinalLaserX(float v) {
-        this.entityData.set(FINAL_LASER_X, v);
-    }
-
-    public float getFinalLaserY() {
-        return this.entityData.get(FINAL_LASER_Y);
-    }
-
-    public void setFinalLaserY(float v) {
-        this.entityData.set(FINAL_LASER_Y, v);
-    }
-
-    public float getFinalLaserZ() {
-        return this.entityData.get(FINAL_LASER_Z);
-    }
-
-    public void setFinalLaserZ(float v) {
-        this.entityData.set(FINAL_LASER_Z, v);
-    }
-
-    public float getFinalLaserYaw() {
-        return this.entityData.get(FINAL_LASER_YAW);
-    }
-
-    public void setFinalLaserYaw(float v) {
-        this.entityData.set(FINAL_LASER_YAW, v);
-    }
-
-    public float getFinalLaserPitch() {
-        return this.entityData.get(FINAL_LASER_PITCH);
-    }
-
-    public void setFinalLaserPitch(float v) {
-        this.entityData.set(FINAL_LASER_PITCH, v);
-    }
+    public int getAttackTick() { return this.entityData.get(ATTACK_TICK); }
+    public void setAttackTick(int tick) { this.entityData.set(ATTACK_TICK, tick); }
+    public int getCannonTick() { return this.entityData.get(CANNON_TICK); }
+    public void setCannonTick(int tick) { this.entityData.set(CANNON_TICK, tick); }
+    public boolean hasEnteredFinalPhase() { return this.entityData.get(ENTERED_FINAL_PHASE); }
+    public void setEnteredFinalPhase(boolean phase) { this.entityData.set(ENTERED_FINAL_PHASE, phase); }
+    public int getTransamTick() { return this.entityData.get(TRANSAM_TICK); }
+    public void setTransamTick(int tick) { this.entityData.set(TRANSAM_TICK, tick); }
+    public boolean isTransamMode() { return this.entityData.get(IS_TRANSAM); }
+    public void setTransamMode(boolean mode) { this.entityData.set(IS_TRANSAM, mode); }
+    public int getFinalLaserTick() { return this.entityData.get(FINAL_LASER_TICK); }
+    public void setFinalLaserTick(int tick) { this.entityData.set(FINAL_LASER_TICK, tick); }
+    public float getFinalLaserX() { return this.entityData.get(FINAL_LASER_X); }
+    public void setFinalLaserX(float v) { this.entityData.set(FINAL_LASER_X, v); }
+    public float getFinalLaserY() { return this.entityData.get(FINAL_LASER_Y); }
+    public void setFinalLaserY(float v) { this.entityData.set(FINAL_LASER_Y, v); }
+    public float getFinalLaserZ() { return this.entityData.get(FINAL_LASER_Z); }
+    public void setFinalLaserZ(float v) { this.entityData.set(FINAL_LASER_Z, v); }
+    public float getFinalLaserYaw() { return this.entityData.get(FINAL_LASER_YAW); }
+    public void setFinalLaserYaw(float v) { this.entityData.set(FINAL_LASER_YAW, v); }
+    public float getFinalLaserPitch() { return this.entityData.get(FINAL_LASER_PITCH); }
+    public void setFinalLaserPitch(float v) { this.entityData.set(FINAL_LASER_PITCH, v); }
+    public int getAllRangeTick() { return this.entityData.get(ALL_RANGE_TICK); }
+    public void setAllRangeTick(int tick) { this.entityData.set(ALL_RANGE_TICK, tick); }
+    public float getAllRangeTrackYaw() { return this.entityData.get(ALL_RANGE_TRACK_YAW); }
+    public void setAllRangeTrackYaw(float v) { this.entityData.set(ALL_RANGE_TRACK_YAW, v); }
+    public float getAllRangeTrackPitch() { return this.entityData.get(ALL_RANGE_TRACK_PITCH); }
+    public void setAllRangeTrackPitch(float v) { this.entityData.set(ALL_RANGE_TRACK_PITCH, v); }
 
     public static AttributeSupplier createAttributes() {
         return Monster.createMonsterAttributes()
@@ -215,7 +173,6 @@ public class RobyteEntity extends Monster implements GeoEntity {
         this.goalSelector.addGoal(2, new RobyteAttackGoal(this));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomFlyingGoal(this, 1.5D));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
@@ -247,6 +204,17 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     private <E extends RobyteEntity> PlayState predicate(AnimationState<E> state) {
         if (this.tickCount < 40 || this.phaseTransitionTick > 0 || this.isDeadOrDying()) return PlayState.STOP;
+        int currentAllRangeTick = this.getAllRangeTick();
+        if (currentAllRangeTick > 0) {
+            if (currentAllRangeTick <= ALL_RANGE_START_DUR) {
+                state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("AllRangeAttackStart"));
+            } else if (currentAllRangeTick <= ALL_RANGE_START_DUR + ALL_RANGE_LOOP_DUR) {
+                state.getController().setAnimation(RawAnimation.begin().thenLoop("AllRangeAttack"));
+            } else {
+                state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("AllRangeAttackEnd"));
+            }
+            return PlayState.CONTINUE;
+        }
 
         if (this.getCannonTick() > 0) {
             state.getController().setAnimation(RawAnimation.begin().thenLoop("CannonAttack"));
@@ -281,6 +249,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             }
             return PlayState.CONTINUE;
         }
+
         if (state.isMoving()) {
             state.getController().setAnimation(RawAnimation.begin().thenLoop(this.hasEnteredFinalPhase() ? "FinalAttackWalking" : "Walking"));
         } else {
@@ -314,6 +283,26 @@ public class RobyteEntity extends Monster implements GeoEntity {
         return 0.7F;
     }
 
+    private void spawnFlameBeamParticles(net.minecraft.world.phys.Vec3 start, float yaw, float pitch, double radius, double distance, int particlesPerTick, int tick) {
+        float f = net.minecraft.util.Mth.cos(-yaw * ((float)Math.PI / 180F) - (float)Math.PI);
+        float f1 = net.minecraft.util.Mth.sin(-yaw * ((float)Math.PI / 180F) - (float)Math.PI);
+        float f2 = -net.minecraft.util.Mth.cos(-pitch * ((float)Math.PI / 180F));
+        float f3 = net.minecraft.util.Mth.sin(-pitch * ((float)Math.PI / 180F));
+        net.minecraft.world.phys.Vec3 look = new net.minecraft.world.phys.Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
+
+        net.minecraft.world.phys.Vec3 up = new net.minecraft.world.phys.Vec3(0, 1, 0);
+        if (Math.abs(look.y) > 0.99) up = new net.minecraft.world.phys.Vec3(1, 0, 0);
+        net.minecraft.world.phys.Vec3 right = look.cross(up).normalize();
+        net.minecraft.world.phys.Vec3 beamUp = right.cross(look).normalize();
+
+        for (int i = 0; i < particlesPerTick; i++) {
+            double angle = (tick * 2.0) + (i * Math.PI * 2 / particlesPerTick);
+            net.minecraft.world.phys.Vec3 offset = right.scale(Math.cos(angle) * radius).add(beamUp.scale(Math.sin(angle) * radius));
+            net.minecraft.world.phys.Vec3 particlePos = start.add(look.scale(distance)).add(offset);
+            this.level().addParticle(net.minecraft.core.particles.ParticleTypes.FLAME, particlePos.x, particlePos.y, particlePos.z, 0.0D, 0.0D, 0.0D);
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -341,52 +330,33 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 net.minecraft.world.phys.Vec3 start = this.getEyePosition();
 
                 for (int angleDeg = 0; angleDeg < 360; angleDeg += 30) {
-                    double rad = Math.toRadians(angleDeg);
-                    double pitchRad = Math.toRadians(-45.0);
-                    net.minecraft.world.phys.Vec3 look = new net.minecraft.world.phys.Vec3(Math.sin(rad) * Math.cos(pitchRad), -Math.sin(pitchRad), Math.cos(rad) * Math.cos(pitchRad));
-                    net.minecraft.world.phys.Vec3 up = new net.minecraft.world.phys.Vec3(0, 1, 0);
-                    net.minecraft.world.phys.Vec3 right = look.cross(up).normalize();
-                    net.minecraft.world.phys.Vec3 beamUp = right.cross(look).normalize();
-
-                    int particlesPerTick = 5;
-                    for (int i = 0; i < particlesPerTick; i++) {
-                        double angle = (tTick * 2.0) + (i * Math.PI * 2 / particlesPerTick);
-                        net.minecraft.world.phys.Vec3 offset = right.scale(Math.cos(angle) * radius).add(beamUp.scale(Math.sin(angle) * radius));
-                        net.minecraft.world.phys.Vec3 particlePos = start.add(look.scale(currentZDist)).add(offset);
-                        this.level().addParticle(net.minecraft.core.particles.ParticleTypes.FLAME, particlePos.x, particlePos.y, particlePos.z, 0.0D, 0.0D, 0.0D);
-                    }
+                    this.spawnFlameBeamParticles(start, (float)angleDeg, -30.0F, radius, currentZDist, 5, tTick);
                 }
             }
 
             int fTick = this.getFinalLaserTick();
             if (fTick > 280 && fTick <= 400) {
                 int pTick = fTick - 280;
-                double radius = 10.0D;
+                double radius = 15.0D;
                 double beamLength = 100.0D;
                 double progress = (double) pTick / 120.0;
                 double currentZDist = progress * beamLength;
-
                 net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getFinalLaserX(), this.getFinalLaserY(), this.getFinalLaserZ());
 
-                float pitch = this.getFinalLaserPitch();
-                float yaw = this.getFinalLaserYaw();
-                float f = net.minecraft.util.Mth.cos(-yaw * ((float)Math.PI / 180F) - (float)Math.PI);
-                float f1 = net.minecraft.util.Mth.sin(-yaw * ((float)Math.PI / 180F) - (float)Math.PI);
-                float f2 = -net.minecraft.util.Mth.cos(-pitch * ((float)Math.PI / 180F));
-                float f3 = net.minecraft.util.Mth.sin(-pitch * ((float)Math.PI / 180F));
-                net.minecraft.world.phys.Vec3 look = new net.minecraft.world.phys.Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
+                this.spawnFlameBeamParticles(start, this.getFinalLaserYaw(), this.getFinalLaserPitch(), radius, currentZDist, 10, pTick);
+            }
 
-                net.minecraft.world.phys.Vec3 up = new net.minecraft.world.phys.Vec3(0, 1, 0);
-                if (Math.abs(look.y) > 0.99) up = new net.minecraft.world.phys.Vec3(1, 0, 0);
-                net.minecraft.world.phys.Vec3 right = look.cross(up).normalize();
-                net.minecraft.world.phys.Vec3 beamUp = right.cross(look).normalize();
-
-                int particlesPerTick = 10;
-                for (int i = 0; i < particlesPerTick; i++) {
-                    double angle = (pTick * 2.0) + (i * Math.PI * 2 / particlesPerTick);
-                    net.minecraft.world.phys.Vec3 offset = right.scale(Math.cos(angle) * radius).add(beamUp.scale(Math.sin(angle) * radius));
-                    net.minecraft.world.phys.Vec3 particlePos = start.add(look.scale(currentZDist)).add(offset);
-                    this.level().addParticle(net.minecraft.core.particles.ParticleTypes.FLAME, particlePos.x, particlePos.y, particlePos.z, 0.0D, 0.0D, 0.0D);
+            int arTick = this.getAllRangeTick();
+            if (arTick > 0 && arTick <= ALL_RANGE_START_DUR) {
+                double beamLength = 100.0D;
+                double progress = (double) arTick / ALL_RANGE_START_DUR;
+                double currentZDist = progress * beamLength;
+                net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getX(), this.getY() + 0.5D, this.getZ());
+                this.spawnFlameBeamParticles(start, this.getAllRangeTrackYaw(), this.getAllRangeTrackPitch(), 5.0D, currentZDist, 10, arTick);
+                for (int pitch = -60; pitch <= 60; pitch += 30) {
+                    for (int yaw = 0; yaw < 360; yaw += 45) {
+                        this.spawnFlameBeamParticles(start, (float)yaw, (float)pitch, 1.0D, currentZDist, 2, arTick);
+                    }
                 }
             }
         }
@@ -411,13 +381,13 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
             if (this.tickCount >= 40) {
                 if (this.teleportCooldown > 0) {
-                    this.teleportCooldown -= this.isTransamMode() ? 2 : 1;
+                    this.teleportCooldown--;
                 }
                 if (this.transamCooldown > 0) {
                     this.transamCooldown--;
                 }
                 LivingEntity target = this.getTarget();
-                if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
+                if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying() && this.getAllRangeTick() == 0) {
                     if (this.cachedArea != null && this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
                         float yRot = player.getYRot();
                         double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
@@ -436,20 +406,18 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     }
                 }
                 if (!this.isDeadOrDying() && this.cachedArea != null) {
-                    if (!this.isDeadOrDying() && this.cachedArea != null) {
-                        if (!this.cachedArea.isEntityInsideArea(this)) {
-                            double dx = this.cachedArea.getX() - this.getX();
-                            double dz = this.cachedArea.getZ() - this.getZ();
-                            double length = Math.sqrt(dx * dx + dz * dz);
-                            if (length > 0) {
-                                double pushForce = 0.5;
-                                this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
-                            }
-                            if (this.getY() > this.cachedArea.getY() + 60.0) {
-                                this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
-                            } else if (this.getY() < this.cachedArea.getY() - 2.0) {
-                                this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
-                            }
+                    if (!this.cachedArea.isEntityInsideArea(this)) {
+                        double dx = this.cachedArea.getX() - this.getX();
+                        double dz = this.cachedArea.getZ() - this.getZ();
+                        double length = Math.sqrt(dx * dx + dz * dz);
+                        if (length > 0) {
+                            double pushForce = 0.5;
+                            this.setDeltaMovement(this.getDeltaMovement().add(dx / length * pushForce, 0, dz / length * pushForce));
+                        }
+                        if (this.getY() > this.cachedArea.getY() + 60.0) {
+                            this.setDeltaMovement(this.getDeltaMovement().add(0, -0.05, 0));
+                        } else if (this.getY() < this.cachedArea.getY() - 2.0) {
+                            this.setDeltaMovement(this.getDeltaMovement().add(0, 0.05, 0));
                         }
                     }
                 }
@@ -459,10 +427,24 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     this.setAttackTick(0);
                     this.setCannonTick(0);
                     this.setTransamTick(0);
+                    this.setAllRangeTick(0);
                     this.setTransamMode(false);
                     this.setFinalLaserTick(0);
                     this.bossEvent.setColor(BossEvent.BossBarColor.GREEN);
                     this.bossEvent.setOverlay(BossEvent.BossBarOverlay.NOTCHED_6);
+
+                    for (RobyteLaserEntity laser : this.allRangeSmallLasers) {
+                        if (laser != null && laser.isAlive()) {
+                            laser.discard();
+                        }
+                    }
+                    this.allRangeSmallLasers.clear();
+                    this.smallLaserInitialYaws.clear();
+                    this.smallLaserInitialPitches.clear();
+                    if (this.allRangeBigLaser != null && this.allRangeBigLaser.isAlive()) {
+                        this.allRangeBigLaser.discard();
+                    }
+                    this.allRangeBigLaser = null;
                 }
                 if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
                     int fTick = this.getFinalLaserTick() + 1;
@@ -507,6 +489,132 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     }
                 }
 
+                int arTick = this.getAllRangeTick();
+                if (arTick > 0) {
+                    this.setAllRangeTick(arTick + 1);
+                    if (arTick == 1) {
+                        if (target != null) {
+                            double dx = target.getX() - this.getX();
+                            double dz = target.getZ() - this.getZ();
+                            this.setAllRangeTrackYaw((float)(net.minecraft.util.Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F);
+                        } else {
+                            this.setAllRangeTrackYaw(this.getYRot());
+                        }
+                        this.setAllRangeTrackPitch(-90.0F);
+
+                        this.allRangeSmallLasers.clear();
+                        this.smallLaserInitialYaws.clear();
+                        this.smallLaserInitialPitches.clear();
+                        this.allRangeBigLaser = null;
+                    }
+
+                    if (arTick > 0 && arTick <= ALL_RANGE_START_DUR) {
+                        float currentYaw = this.getAllRangeTrackYaw();
+                        float currentPitch = this.getAllRangeTrackPitch();
+
+                        if (target != null) {
+                            double dx = target.getX() - this.getX();
+                            double dy = target.getEyeY() - (this.getY() + 0.5D);
+                            double dz = target.getZ() - this.getZ();
+                            float targetYaw = (float)(net.minecraft.util.Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+                            float targetPitch = (float)(-(net.minecraft.util.Mth.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180F / Math.PI)));
+
+                            float diffYaw = net.minecraft.util.Mth.wrapDegrees(targetYaw - currentYaw);
+                            float turn = 0.005F;
+                            currentYaw += diffYaw * turn;
+                            currentPitch = -90.0F;
+                        }
+                        this.setAllRangeTrackYaw(currentYaw);
+                        this.setAllRangeTrackPitch(currentPitch);
+                    }
+
+                    if (arTick == ALL_RANGE_START_DUR + 1) {
+                        for (int pitch = -60; pitch <= 60; pitch += 30) {
+                            for (int yaw = 0; yaw < 360; yaw += 45) {
+                                RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+                                laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                                laser.setYRot(yaw);
+                                laser.setXRot((float)pitch);
+                                laser.setRadius(1.0F);
+                                laser.setMaxLife(ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR);
+                                laser.setDamage(0.5F);
+                                laser.setOwner(this);
+                                this.level().addFreshEntity(laser);
+
+                                this.allRangeSmallLasers.add(laser);
+                                this.smallLaserInitialYaws.add((float)yaw);
+                                this.smallLaserInitialPitches.add((float)pitch);
+                            }
+                        }
+
+                        RobyteLaserEntity bigLaser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+                        bigLaser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                        bigLaser.setYRot(this.getAllRangeTrackYaw());
+                        bigLaser.setXRot(this.getAllRangeTrackPitch());
+                        bigLaser.setRadius(1.0F);
+                        bigLaser.setMaxLife(ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR);
+                        bigLaser.setDamage(1.0F);
+                        bigLaser.setOwner(this);
+                        this.level().addFreshEntity(bigLaser);
+                        this.allRangeBigLaser = bigLaser;
+                    }
+
+                    if (arTick > ALL_RANGE_START_DUR && arTick <= ALL_RANGE_TOTAL_DUR) {
+                        int loopTick = arTick - ALL_RANGE_START_DUR;
+                        float baseYaw = Math.min(loopTick, ALL_RANGE_LOOP_DUR) * 2.0F;
+
+                        for (int i = 0; i < this.allRangeSmallLasers.size(); i++) {
+                            RobyteLaserEntity laser = this.allRangeSmallLasers.get(i);
+                            if (laser != null && laser.isAlive()) {
+                                laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                                laser.setYRot(baseYaw + this.smallLaserInitialYaws.get(i));
+                                laser.setXRot(this.smallLaserInitialPitches.get(i));
+                            }
+                        }
+
+                        float currentYaw = this.getAllRangeTrackYaw();
+                        float currentPitch = this.getAllRangeTrackPitch();
+                        if (loopTick <= ALL_RANGE_LOOP_DUR) {
+                            if (loopTick % 10 == 0) {
+                                this.summonBitLaser();
+                            }
+
+                            if (target != null) {
+                                double dx = target.getX() - this.getX();
+                                double dy = target.getEyeY() - (this.getY() + 0.5D);
+                                double dz = target.getZ() - this.getZ();
+                                float targetYaw = (float)(net.minecraft.util.Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+                                float targetPitch = (float)(-(net.minecraft.util.Mth.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180F / Math.PI)));
+
+                                float diffYaw = net.minecraft.util.Mth.wrapDegrees(targetYaw - currentYaw);
+                                float turn = 0.005F;
+                                currentYaw += diffYaw * turn;
+
+                                float diffPitch = net.minecraft.util.Mth.wrapDegrees(targetPitch - currentPitch);
+                                currentPitch += diffPitch * turn;
+                            }
+                        }
+
+                        this.setAllRangeTrackYaw(currentYaw);
+                        this.setAllRangeTrackPitch(currentPitch);
+
+                        if (this.allRangeBigLaser != null && this.allRangeBigLaser.isAlive()) {
+                            this.allRangeBigLaser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                            this.allRangeBigLaser.setYRot(currentYaw);
+                            this.allRangeBigLaser.setXRot(currentPitch);
+                        }
+                    }
+
+                    if (arTick > ALL_RANGE_TOTAL_DUR) {
+                        this.setAllRangeTick(0);
+                        this.attackCooldown = 20;
+                        this.allRangeSmallLasers.clear();
+                        this.smallLaserInitialYaws.clear();
+                        this.smallLaserInitialPitches.clear();
+                        this.allRangeBigLaser = null;
+                    }
+                }
+
                 int tTick = this.getTransamTick();
                 if (tTick > 0) {
                     this.setTransamTick(tTick + 1);
@@ -515,7 +623,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
                             laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
                             laser.setYRot(i);
-                            laser.setXRot(-45.0F);
+                            laser.setXRot(-30.0F);
                             laser.setRadius(10.0F);
                             laser.setMaxLife(400);
                             laser.setDamage(0.5F);
@@ -530,7 +638,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     if (tTick > 120 + ROTATION_TOTAL_ATTACK_DUR) {
                         this.setTransamTick(0);
                         this.setTransamMode(false);
-                        this.attackCooldown = 20;
+                        this.attackCooldown = 200;
                     }
                 }
 
