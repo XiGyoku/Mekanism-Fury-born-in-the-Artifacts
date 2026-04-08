@@ -2,6 +2,7 @@
   "entity.furyborn.robyte": "Robyte - FuryBorn in the Artifacts",
   "entity.furyborn.robyte_area": "KBF",
   "entity.furyborn.robyte_bit_laser": "Bit Laser",
+    "entity.furyborn.robyte_laser": "Quantum Laser",
   "item.furyborn.robyte_spawn_egg": "Robyte Spawn Egg",
   "subtitles.furyborn.t_supercomputer_loading": "Supercomputer boots up",
   "subtitles.furyborn.robyte_teleport": "Robyte teleports",
@@ -19,5 +20,10 @@
   "item.furyborn.buster_thrower": "Buster Thrower",
   "item.furyborn.buster_thrower_desc": "I won't die!",
   "item.furyborn.halo_of_exolumen": "Halo of Exolumen",
+  "item.furyborn.halo_of_exolumen_desc1": "§1The Zenith of the Endeavor, §a§lHalo of Exolumen.",
+  "item.furyborn.halo_of_exolumen_desc2": "§1A lost relic of a civilization from a long-forgotten era.",
+  "item.furyborn.halo_of_exolumen_desc3": "§8The war tore the stars apart, and the pioneers fled beyond the sky.",
+    "item.furyborn.halo_of_exolumen_desc4": "§8The future of the stars is now in your hands.",
+  "item.furyborn.halo_of_exolumen_desc5": "§4§l[CENSORED]",
   "effect.furyborn.monitored": "Monitored"
 }

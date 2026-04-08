@@ -4,6 +4,7 @@ import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.entity.RobyteBitLaserEntity;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -17,6 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -28,6 +31,8 @@ import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.SlotContext;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 public class HaloOfExolumenItem extends Item implements ICurioItem {
@@ -124,6 +129,16 @@ public class HaloOfExolumenItem extends Item implements ICurioItem {
             bit.setDamage(target.getHealth() / 10.0F);
             player.level().addFreshEntity(bit);
         }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+        pTooltipComponents.add(Component.translatable("item.furyborn.halo_of_exolumen_desc1"));
+        pTooltipComponents.add(Component.translatable("item.furyborn.halo_of_exolumen_desc2"));
+        pTooltipComponents.add(Component.translatable("item.furyborn.halo_of_exolumen_desc3"));
+        pTooltipComponents.add(Component.translatable("item.furyborn.halo_of_exolumen_desc4"));
+        pTooltipComponents.add(Component.translatable("item.furyborn.halo_of_exolumen_desc5"));
     }
 
     @Override

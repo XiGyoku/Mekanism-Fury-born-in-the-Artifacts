@@ -354,14 +354,14 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 net.minecraft.world.phys.Vec3 start = this.getEyePosition();
 
                 for (int angleDeg = 0; angleDeg < 360; angleDeg += 30) {
-                    this.spawnFlameBeamParticles(start, (float)angleDeg, -30.0F, radius, currentZDist, 5, tTick);
+                    this.spawnFlameBeamParticles(start, (float)angleDeg, -15.0F, radius, currentZDist, 5, tTick);
                 }
             }
 
             int fTick = this.getFinalLaserTick();
             if (fTick > 280 && fTick <= 400) {
                 int pTick = fTick - 280;
-                double radius = 15.0D;
+                double radius = 30.0D;
                 double beamLength = 100.0D;
                 double progress = (double) pTick / 120.0;
                 double currentZDist = progress * beamLength;
@@ -548,7 +548,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             float targetPitch = (float)(-(net.minecraft.util.Mth.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180F / Math.PI)));
 
                             float diffYaw = net.minecraft.util.Mth.wrapDegrees(targetYaw - currentYaw);
-                            float turn = 0.005F;
+                            float turn = 0.01F;
                             currentYaw += diffYaw * turn;
                             currentPitch = -90.0F;
                         }
@@ -600,7 +600,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             if (laser != null && laser.isAlive()) {
                                 laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
                                 laser.setYRot(baseYaw + this.smallLaserInitialYaws.get(i));
-                                laser.setXRot(this.smallLaserInitialPitches.get(i));
+                                float pitchOffset = (float)Math.sin(loopTick * 0.03F + Math.toRadians(this.smallLaserInitialPitches.get(i))) * 40.0F;
+                                laser.setXRot(this.smallLaserInitialPitches.get(i) + pitchOffset);
                             }
                         }
 
@@ -610,6 +611,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             if (loopTick % 10 == 0) {
                                 for (int m = 0; m < multiplier; m++) {
                                     this.summonBitLaser(m==0);
+                                    this.summonBitLaserAllRange(m==0);
                                 }
                             }
 
@@ -658,7 +660,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                                 RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
                                 laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
                                 laser.setYRot(i);
-                                laser.setXRot(-30.0F);
+                                laser.setXRot(-15.0F);
                                 laser.setRadius(10.0F);
                                 laser.setMaxLife(400);
                                 laser.setDamage(0.5F);
@@ -741,9 +743,17 @@ public class RobyteEntity extends Monster implements GeoEntity {
         laser.setPos(this.getFinalLaserX(), this.getFinalLaserY(), this.getFinalLaserZ());
         laser.setYRot(this.getFinalLaserYaw());
         laser.setXRot(this.getFinalLaserPitch());
-        laser.setRadius(10.0F);
+        if (this.isRebellion()) {
+            laser.setRadius(30.0F);
+        } else {
+        laser.setRadius(15.0F);
+        }
         laser.setMaxLife(400);
-        laser.setDamage(0.5F);
+        if (this.isRebellion()) {
+            laser.setDamage(4.0F);
+        } else {
+            laser.setDamage(0.5F);
+        }
         laser.setOwner(this);
         laser.setMuted(!SoundPlaying);
         this.level().addFreshEntity(laser);
@@ -785,7 +795,29 @@ public class RobyteEntity extends Monster implements GeoEntity {
             bit.setOwner(this);
             bit.setTarget(this.level().getNearestPlayer(this, 128.0));
             bit.setMuted(!PlayingSound);
+            if (this.isRebellion()) {
+                bit.setDamage(4.0F);
+            }
             this.level().addFreshEntity(bit);
+        }
+    }
+
+    private void summonBitLaserAllRange(boolean PlayingSound) {
+        if (!this.level().isClientSide) {
+            boolean isFirst = true;
+            for (LivingEntity target : this.level().getEntitiesOfClass(Player.class, this.getBoundingBox().inflate(128.0D))) {
+                if (target instanceof RobyteEntity) continue;
+                RobyteBitLaserEntity bit = new RobyteBitLaserEntity(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), this.level());
+                bit.setOwner(this);
+                bit.setTarget(target);
+                bit.moveTo(target.getX(), target.getY(), target.getZ(), this.getYRot(), this.getXRot());
+                bit.setMuted(!(PlayingSound && isFirst));
+                isFirst = false;
+                if (this.isRebellion()) {
+                    bit.setDamage(4.0F);
+                }
+                this.level().addFreshEntity(bit);
+            }
         }
     }
 
@@ -797,6 +829,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
             bit.setTarget(this.level().getNearestPlayer(this, 128.0));
             bit.setMode(true);
             bit.setMuted(!PlayingSound);
+            if (this.isRebellion()) {
+                bit.setDamage(4.0F);
+            }
             this.level().addFreshEntity(bit);
         }
     }

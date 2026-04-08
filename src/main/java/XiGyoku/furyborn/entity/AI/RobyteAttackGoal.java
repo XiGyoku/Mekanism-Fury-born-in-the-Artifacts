@@ -34,7 +34,7 @@ public class RobyteAttackGoal extends Goal {
             mob.setTransamMode(true);
             mob.transamCooldown = 400;
         } else {
-            boolean canUseAllRange = mob.getHealth() <= mob.getMaxHealth() * 0.5F && !mob.hasEnteredFinalPhase();
+            boolean canUseAllRange = mob.getHealth() <= mob.getMaxHealth() * 0.7F && !mob.hasEnteredFinalPhase();
             int maxRandom = canUseAllRange ? 3 : 2;
             int r = mob.getRandom().nextInt(maxRandom);
 

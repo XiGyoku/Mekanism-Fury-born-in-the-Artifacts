@@ -22,6 +22,8 @@ public abstract class LivingEntityMixin extends Entity {
         if ((Object) this instanceof RobyteEntity robyte) {
             if (robyte.isRebellion()) {
                 cir.setReturnValue((float) Integer.MAX_VALUE);
+            } else {
+                cir.setReturnValue(2000.0f);
             }
         }
     }
