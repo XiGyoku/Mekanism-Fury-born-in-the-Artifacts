@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "furyborn:root",
+  "parent": "furyborn:supercomputer",
   "criteria": {
     "killed_boss": {
       "trigger": "minecraft:player_killed_entity",

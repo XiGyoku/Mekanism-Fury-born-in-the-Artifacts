@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:t_supercomputer"
+    },
+    "title": {
+      "text": "SUUUUUUUUUUUUUPER COMPUTING!!!!!!"
+    },
+    "description": {
+      "text": "スーパーコンピューター帝を作成する。Tだよ！Kじゃないよ！"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:root",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:t_supercomputer"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
