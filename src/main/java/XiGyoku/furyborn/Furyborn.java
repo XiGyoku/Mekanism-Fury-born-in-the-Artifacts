@@ -10,6 +10,7 @@ import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.client.entity.RobyteAreaRenderer;
 import XiGyoku.furyborn.client.entity.RobyteRenderer;
 import XiGyoku.furyborn.item.FuryBornItems;
+import XiGyoku.furyborn.network.FuryBornNetwork;
 import XiGyoku.furyborn.sound.FuryBornSounds;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -81,6 +82,7 @@ public class Furyborn {
         FuryBornItems.register(modEventBus);
         FuryBornEffects.register(modEventBus);
         FuryBornSounds.register(modEventBus);
+        FuryBornNetwork.register();
 
         FuryBornEntityTypes.register(modEventBus);
 

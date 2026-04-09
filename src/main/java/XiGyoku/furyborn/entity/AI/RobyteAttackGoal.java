@@ -67,7 +67,7 @@ public class RobyteAttackGoal extends Goal {
                 mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
             } else {
                 int spinTick = tTick - 120;
-                if (spinTick > mob.ROTATION_START_DUR && spinTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
+                if (spinTick > mob.ROTATION_START_DUR && spinTick <= mob.ROTATION_START_DUR + mob.TRANSAM_LOOP_DUR) {
                     double dx = target.getX() - mob.getX();
                     double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
                     double dz = target.getZ() - mob.getZ();

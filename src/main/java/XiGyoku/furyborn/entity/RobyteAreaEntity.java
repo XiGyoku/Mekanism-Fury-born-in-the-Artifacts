@@ -22,8 +22,20 @@ public class RobyteAreaEntity extends Entity {
         this.noCulling = true;
     }
 
-    public void setRobyte(RobyteEntity robyte) {
+    public void setRobyte(RobyteEntity robyte)
+    {
         this.bossId = robyte.getUUID();
+    }
+
+    public RobyteEntity getRobyte() {
+        if (this.bossId == null) return null;
+        if (this.level() instanceof ServerLevel serverLevel) {
+            Entity entity = serverLevel.getEntity(this.bossId);
+            if (entity instanceof RobyteEntity robyte) {
+                return robyte;
+            }
+        }
+        return null;
     }
 
     public UUID getRobyteId() {
@@ -109,7 +121,11 @@ public class RobyteAreaEntity extends Entity {
                             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 2));
                             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 2));
                             if (player.tickCount % 20 == 0) {
-                                player.hurt(serverLevel.damageSources().magic(), 2.0F);
+                                if (!this.getRobyte().isRebellion()) {
+                                    player.hurt(serverLevel.damageSources().magic(), 2.0F);
+                                } else {
+                                    player.hurt(serverLevel.damageSources().magic(), Float.MAX_VALUE);
+                                }
                             }
                         }
                     }

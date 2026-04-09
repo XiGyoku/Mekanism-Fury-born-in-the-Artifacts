@@ -41,13 +41,16 @@ public class RobyteLaserRenderer extends EntityRenderer<RobyteLaserEntity> {
         int currentAlpha = (int) (200 * alphaScale);
 
         if (currentAlpha > 0 && currentRadius > 0.0F) {
-            float length = 100.0F;
-            int segments = 8;
+            float length = 200.0F;
+            int segments = 16;
 
             VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.lightning());
 
             Matrix4f posMatrix = poseStack.last().pose();
             Matrix3f normalMatrix = poseStack.last().normal();
+
+            int[] color = entity.isExplosive() ? new int[]{255, 255, 0} : new int[]{0, 255, 0};
+            color = entity.isOvercharge() ? new int[]{255, 51, 153} : color;
 
             for (int i = 0; i < segments; i++) {
                 float angle1 = (float) i / segments * (float) Math.PI * 2.0F;
@@ -58,10 +61,10 @@ public class RobyteLaserRenderer extends EntityRenderer<RobyteLaserEntity> {
                 float x2 = (float) Math.cos(angle2) * currentRadius;
                 float z2 = (float) Math.sin(angle2) * currentRadius;
 
-                addVertex(vertexConsumer, posMatrix, normalMatrix, x1, z1, 0, 0, 255, 0, currentAlpha);
-                addVertex(vertexConsumer, posMatrix, normalMatrix, x1, z1, length, 0, 255, 0, currentAlpha);
-                addVertex(vertexConsumer, posMatrix, normalMatrix, x2, z2, length, 0, 255, 0, currentAlpha);
-                addVertex(vertexConsumer, posMatrix, normalMatrix, x2, z2, 0, 0, 255, 0, currentAlpha);
+                addVertex(vertexConsumer, posMatrix, normalMatrix, x1, z1, 0, color[0], color[1], color[2], currentAlpha);
+                addVertex(vertexConsumer, posMatrix, normalMatrix, x1, z1, length, color[0], color[1], color[2], currentAlpha);
+                addVertex(vertexConsumer, posMatrix, normalMatrix, x2, z2, length, color[0], color[1], color[2], currentAlpha);
+                addVertex(vertexConsumer, posMatrix, normalMatrix, x2, z2, 0, color[0], color[1], color[2], currentAlpha);
             }
         }
 

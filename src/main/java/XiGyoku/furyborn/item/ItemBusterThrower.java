@@ -16,6 +16,7 @@ import mekanism.common.capabilities.energy.item.RateLimitEnergyHandler;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.util.StorageUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -34,6 +35,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +45,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
     public static final FloatingLong MAX_ENERGY = FloatingLong.createConst(2500000);
     public static final FloatingLong ENERGY_COST = FloatingLong.createConst(125000);
+    public static final FloatingLong MAX_ENERGY_COST = FloatingLong.createConst(250000);
     public static final FloatingLong CHARGE_RATE = FloatingLong.createConst(50000);
 
     public ItemBusterThrower(Properties properties) {
@@ -60,6 +65,17 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         StorageUtils.addStoredEnergy(stack, tooltip, true);
+        int mode = getBusterMode(stack);
+        String langKey = mode == 2 ? "overcharge" : (mode == 1 ? "explosion" : "none");
+        net.minecraft.ChatFormatting color = mode == 2 ? ChatFormatting.LIGHT_PURPLE : (mode == 1 ? net.minecraft.ChatFormatting.RED : net.minecraft.ChatFormatting.AQUA);
+
+        tooltip.add(Component.translatable("tooltip.furyborn.buster_mode").withStyle(net.minecraft.ChatFormatting.GRAY)
+                .append(Component.translatable("tooltip.furyborn.buster_mode." + langKey).withStyle(color)));
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy().withStyle(net.minecraft.ChatFormatting.AQUA);
     }
 
     @Override
@@ -104,10 +120,12 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-
         if (!player.isCreative()) {
             IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
-            if (energyContainer == null || energyContainer.extract(ENERGY_COST, Action.SIMULATE, AutomationType.MANUAL).smallerThan(ENERGY_COST)) {
+            int mode = getBusterMode(stack);
+            FloatingLong currentCost = mode == 2 ? MAX_ENERGY : (mode == 1 ? MAX_ENERGY_COST : ENERGY_COST);
+
+            if (energyContainer == null || energyContainer.extract(currentCost, Action.SIMULATE, AutomationType.MANUAL).smallerThan(currentCost)) {
                 return InteractionResultHolder.fail(stack);
             }
         }
@@ -121,8 +139,11 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
         if (!(entity instanceof Player player)) return;
 
         IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
+        int mode = getBusterMode(stack);
+        FloatingLong currentCost = mode == 2 ? MAX_ENERGY : (mode == 1 ? MAX_ENERGY_COST : ENERGY_COST);
+
         if (!player.isCreative()) {
-            if (energyContainer == null || energyContainer.extract(ENERGY_COST, Action.SIMULATE, AutomationType.MANUAL).smallerThan(ENERGY_COST)) {
+            if (energyContainer == null || energyContainer.extract(currentCost, Action.SIMULATE, AutomationType.MANUAL).smallerThan(currentCost)) {
                 entity.releaseUsingItem();
                 return;
             }
@@ -164,22 +185,43 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
         if (useTime > 0 && cycleTime == chargeTime) {
             if (!level.isClientSide) {
                 if (!player.isCreative() && energyContainer != null) {
-                    energyContainer.extract(ENERGY_COST, Action.EXECUTE, AutomationType.MANUAL);
+                    energyContainer.extract(currentCost, Action.EXECUTE, AutomationType.MANUAL);
                 }
 
                 RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), level);
-                laser.setPos(player.getX(), player.getEyeY() - 0.2D, player.getZ());
+                if (mode == 2) {
+                    Vec3 look = player.getLookAngle();
+                    laser.setPos(player.getX() + look.x * 10.0D, (player.getEyeY() - 0.2D) + look.y * 10.0D, player.getZ() + look.z * 10.0D);
+                } else {
+                    laser.setPos(player.getX(), player.getEyeY() - 0.2D, player.getZ());
+                }
                 laser.setXRot(player.getXRot());
                 laser.setYRot(player.getYRot());
 
-                laser.setRadius(10.0F);
-                laser.setMaxLife(400);
+                laser.setRadius(15.0F);
+                laser.setMaxLife(mode == 2 ? 200 : 1000);
                 laser.setDamage(4.0F);
+                laser.setExplosive(mode == 1 || mode == 2);
+                laser.setOvercharge(mode == 2);
                 laser.setOwner(player);
 
                 level.addFreshEntity(laser);
             }
         }
+    }
+
+    public static int getBusterMode(ItemStack stack) {
+        CompoundTag nbt = stack.getOrCreateTag();
+        if (!nbt.contains("BusterMode")) {
+            if (nbt.contains("ExplosionMode") && nbt.getBoolean("ExplosionMode")) return 1;
+            return 0;
+        }
+        return nbt.getInt("BusterMode");
+    }
+
+    public static void cycleBusterMode(ItemStack stack) {
+        int current = getBusterMode(stack);
+        stack.getOrCreateTag().putInt("BusterMode", (current + 1) % 3);
     }
 
     @Override

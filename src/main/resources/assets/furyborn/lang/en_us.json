@@ -23,7 +23,17 @@
   "item.furyborn.halo_of_exolumen_desc1": "§1The Zenith of the Endeavor, §a§lHalo of Exolumen.",
   "item.furyborn.halo_of_exolumen_desc2": "§1A lost relic of a civilization from a long-forgotten era.",
   "item.furyborn.halo_of_exolumen_desc3": "§8The war tore the stars apart, and the pioneers fled beyond the sky.",
-    "item.furyborn.halo_of_exolumen_desc4": "§8The future of the stars is now in your hands.",
+  "item.furyborn.halo_of_exolumen_desc4": "§8The future of the stars is now in your hands.",
   "item.furyborn.halo_of_exolumen_desc5": "§4§l[CENSORED]",
-  "effect.furyborn.monitored": "Monitored"
+  "effect.furyborn.monitored": "Monitored",
+  "key.categories.furyborn": "FuryBorn",
+  "key.furyborn.toggle_buster_mode": "Toggle Buster Mode",
+  "tooltip.furyborn.buster_mode": "Mode: ",
+  "tooltip.furyborn.buster_mode.explosion": "Explosion",
+  "tooltip.furyborn.buster_mode.none": "Normal",
+  "tooltip.furyborn.buster_mode.overcharge": "Overcharge",
+  "message.furyborn.buster_mode": "%sMode: %s",
+  "message.furyborn.buster_mode.explosion": "Explosion",
+  "message.furyborn.buster_mode.none": "Normal",
+  "message.furyborn.buster_mode.overcharge": "Overcharge"
 }

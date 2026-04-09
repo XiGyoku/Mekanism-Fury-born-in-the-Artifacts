@@ -81,6 +81,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public final int ALL_RANGE_END_DUR = 80;
     public final int ALL_RANGE_TOTAL_DUR = ALL_RANGE_START_DUR + ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR;
 
+    public final int TRANSAM_LOOP_DUR = 400;
+    public final int TRANSAM_TOTAL_ATTACK_DUR = ROTATION_START_DUR + TRANSAM_LOOP_DUR + ROTATION_END_DUR;
+
     private boolean hasSummonedArea = false;
     private RobyteAreaEntity cachedArea = null;
     public int teleportCooldown = 0;
@@ -93,6 +96,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
     private final java.util.List<Float> smallLaserInitialYaws = new java.util.ArrayList<>();
     private final java.util.List<Float> smallLaserInitialPitches = new java.util.ArrayList<>();
     private RobyteLaserEntity allRangeBigLaser = null;
+
+    public int transamTeleportCount = 0;
+    public final java.util.List<net.minecraft.world.phys.Vec3> pastPositions = new java.util.ArrayList<>();
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -251,7 +257,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 int spinTick = currentTransamTick - 120;
                 if (spinTick <= ROTATION_START_DUR) {
                     state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackStart"));
-                } else if (spinTick <= ROTATION_START_DUR + ROTATION_LOOP_DUR) {
+                } else if (spinTick <= ROTATION_START_DUR + TRANSAM_LOOP_DUR) {
                     state.getController().setAnimation(RawAnimation.begin().thenLoop("RotationAttack"));
                 } else {
                     state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackEnd"));
@@ -331,6 +337,14 @@ public class RobyteEntity extends Monster implements GeoEntity {
         int multiplier = this.isRebellion() ? 10 : 1;
 
         if (this.level().isClientSide() && !this.isDeadOrDying()) {
+            if (this.isTransamMode()) {
+                this.pastPositions.add(0, this.position());
+                if (this.pastPositions.size() > 5) {
+                    this.pastPositions.remove(this.pastPositions.size() - 1);
+                }
+            } else if (!this.pastPositions.isEmpty()) {
+                this.pastPositions.clear();
+            }
             if (!this.hasStartedClientBgm) {
                 ClientSoundHelper.playRobyteBgm(this);
                 this.hasStartedClientBgm = true;
@@ -413,20 +427,42 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 LivingEntity target = this.getTarget();
                 if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying() && this.getAllRangeTick() == 0) {
                     if (this.cachedArea != null && this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
-                        float yRot = player.getYRot();
-                        double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
-                        double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
 
-                        double targetX = player.getX() + offsetX;
-                        double targetY = player.getY() + 1.0;
-                        double targetZ = player.getZ() + offsetZ;
+                        double targetX, targetY, targetZ;
 
-                        this.teleportTo(targetX, targetY, targetZ);
-                        this.lookAt(player, 30.0F, 30.0F);
-                        this.setYRot(player.getYRot());
+                        if (this.isTransamMode()) {
+                            double randomAngle = this.random.nextDouble() * 2.0 * Math.PI;
+                            double distance = 12.0;
+                            targetX = player.getX() + Math.cos(randomAngle) * distance;
+                            targetY = player.getY();
+                            targetZ = player.getZ() + Math.sin(randomAngle) * distance;
+
+                            this.teleportTo(targetX, targetY, targetZ);
+                            this.lookAt(player, 30.0F, 30.0F);
+
+                            this.transamTeleportCount++;
+                            if (this.transamTeleportCount % 4 == 0) {
+                                this.teleportCooldown = 400;
+                            } else {
+                                this.teleportCooldown = 50;
+                            }
+                        } else {
+                            float yRot = player.getYRot();
+                            double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
+                            double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
+
+                            targetX = player.getX() + offsetX;
+                            targetY = player.getY() + 1.0;
+                            targetZ = player.getZ() + offsetZ;
+
+                            this.teleportTo(targetX, targetY, targetZ);
+                            this.lookAt(player, 30.0F, 30.0F);
+                            this.setYRot(player.getYRot());
+
+                            this.teleportCooldown = 400;
+                        }
 
                         this.playSound(FuryBornSounds.ROBYTE_TELEPORT.get(), 1.0F, 1.0F);
-                        this.teleportCooldown = this.isTransamMode() ? 200 : 400;
                     }
                 }
                 if (!this.isDeadOrDying() && this.cachedArea != null) {
@@ -454,6 +490,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     this.setAllRangeTick(0);
                     this.setTransamMode(false);
                     this.setFinalLaserTick(0);
+                    this.transamTeleportCount = 0;
                     this.bossEvent.setColor(BossEvent.BossBarColor.GREEN);
                     this.bossEvent.setOverlay(BossEvent.BossBarOverlay.NOTCHED_6);
 
@@ -662,7 +699,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
                                 laser.setYRot(i);
                                 laser.setXRot(-15.0F);
                                 laser.setRadius(10.0F);
-                                laser.setMaxLife(400);
+                                laser.setMaxLife(TRANSAM_TOTAL_ATTACK_DUR);
+
                                 laser.setDamage(0.5F);
                                 laser.setOwner(this);
                                 this.level().addFreshEntity(laser);
@@ -675,10 +713,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             this.summonPredictBitLaser(m==0);
                         }
                     }
-                    if (tTick > 120 + ROTATION_TOTAL_ATTACK_DUR) {
+                    if (tTick > 120 + TRANSAM_TOTAL_ATTACK_DUR) {
                         this.setTransamTick(0);
                         this.setTransamMode(false);
                         this.attackCooldown = 200;
+                        this.transamTeleportCount = 0;
                     }
                 }
 
