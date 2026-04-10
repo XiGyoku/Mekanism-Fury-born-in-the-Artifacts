@@ -98,110 +98,99 @@ public class RobyteLaserEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (!this.level().isClientSide) {
-            if (this.tickCount == 1 && !this.isMuted) {
-                this.playSound(FuryBornSounds.ROBYTE_BEAMING.get(), 0.25F, 1.0F);
-            }
-            if (this.tickCount >= getMaxLife()) {
-                this.discard();
-                return;
-            }
 
-            float growDuration = 5.0F;
-            float radiusScale = Mth.clamp((float) this.tickCount / growDuration, 0.0F, 1.0F);
-            float currentHitRadius = this.getRadius() * radiusScale;
+        if (this.level().isClientSide) return;
 
-            Vec3 start = this.position();
-            Vec3 dir = this.getLookAngle();
-            double length = 200.0D;
-            Vec3 end = start.add(dir.scale(length));
+        if (this.tickCount == 1 && !this.isMuted) {
+            this.playSound(FuryBornSounds.ROBYTE_BEAMING.get(), 0.25F, 1.0F);
+        }
+
+        if (this.tickCount >= getMaxLife()) {
+            this.discard();
+            return;
+        }
+
+        float growDuration = 5.0F;
+        float radiusScale = Mth.clamp((float) this.tickCount / growDuration, 0.0F, 1.0F);
+        float currentHitRadius = this.getRadius() * radiusScale;
+
+        Vec3 start = this.position();
+        Vec3 dir = this.getLookAngle();
+        double length = 200.0D;
+        Vec3 end = start.add(dir.scale(length));
+
+        net.minecraft.world.level.ClipContext context = new net.minecraft.world.level.ClipContext(
+                start, end,
+                net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.NONE,
+                this
+        );
+        net.minecraft.world.phys.BlockHitResult blockHit = this.level().clip(context);
+
+        if (blockHit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            end = blockHit.getLocation();
+
             if ((this.isExplosive() || this.isOvercharge()) && this.tickCount % 10 == 0) {
                 float explosionRadius = Math.max(4.0F, currentHitRadius * 1.5F);
-                double step = 4.0D;
-                boolean hitSomething = false;
 
-                for (double d = step; d <= length; d += step) {
-                    Vec3 currentPos = start.add(dir.scale(d));
-                    AABB checkAABB = new AABB(
-                            currentPos.x - currentHitRadius, currentPos.y - currentHitRadius, currentPos.z - currentHitRadius,
-                            currentPos.x + currentHitRadius, currentPos.y + currentHitRadius, currentPos.z + currentHitRadius
+                if (this.isOvercharge()) {
+                    AABB destroyBox = new AABB(
+                            end.x - explosionRadius, end.y - explosionRadius, end.z - explosionRadius,
+                            end.x + explosionRadius, end.y + explosionRadius, end.z + explosionRadius
+                    );
+                    BlockPos.betweenClosedStream(destroyBox).forEach(pos -> {
+                        BlockPos immutablePos = pos.immutable();
+                        if (!this.level().getBlockState(immutablePos).isAir() &&
+                                this.level().getBlockState(immutablePos).getDestroySpeed(this.level(), immutablePos) >= 0) {
+                            this.level().destroyBlock(immutablePos, false, this);
+                        }
+                    });
+                } else {
+                    this.level().explode(
+                            this.getOwner() != null ? this.getOwner() : this,
+                            end.x, end.y, end.z,
+                            explosionRadius,
+                            Level.ExplosionInteraction.BLOCK
                     );
 
-                    boolean hasBlock = BlockPos.betweenClosedStream(checkAABB)
-                            .anyMatch(pos -> !this.level().getBlockState(pos).isAir()
-                                    && this.level().getBlockState(pos).getFluidState().isEmpty());
-
-                    if (hasBlock) {
-                        hitSomething = true;
-                        if (this.isOvercharge()) {
-                            BlockPos.betweenClosedStream(checkAABB).forEach(pos -> {
-                                BlockPos immutablePos = pos.immutable();
-                                if (this.level().getBlockState(immutablePos).getDestroySpeed(this.level(), immutablePos) >= 0) {
-                                    this.level().destroyBlock(immutablePos, false, this);
-                                }
-                            });
-                        }
-                        else {
-                            this.level().explode(
-                                    this.getOwner() != null ? this.getOwner() : this,
-                                    currentPos.x, currentPos.y, currentPos.z,
-                                    explosionRadius,
-                                    Level.ExplosionInteraction.BLOCK
-                            );
-                            if (this.level() instanceof ServerLevel serverLevel) {
-                                int particleCount = (int) (explosionRadius * 20);
-                                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION_EMITTER,
-                                        currentPos.x, currentPos.y, currentPos.z, particleCount / 5,
-                                        explosionRadius * 0.5, explosionRadius * 0.5, explosionRadius * 0.3, 0.1D);
-                                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
-                                        currentPos.x, currentPos.y, currentPos.z, particleCount,
-                                        explosionRadius * 0.5, explosionRadius * 0.5, explosionRadius * 0.4, 0.3D);
-                                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
-                                        currentPos.x, currentPos.y, currentPos.z, particleCount,
-                                        explosionRadius * 0.5, explosionRadius * 0.5, explosionRadius * 0.5, 0.1D);
-                            }
-                        }
-                    } else if (hitSomething) {
-                        end = currentPos;
-                        break;
+                    if (this.level() instanceof ServerLevel serverLevel) {
+                        int particleCount = (int) (explosionRadius * 20);
+                        serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION_EMITTER,
+                                end.x, end.y, end.z, particleCount / 5,
+                                explosionRadius * 0.5, explosionRadius * 0.5, explosionRadius * 0.3, 0.1D);
+                        serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
+                                end.x, end.y, end.z, particleCount,
+                                explosionRadius * 0.5, explosionRadius * 0.5, explosionRadius * 0.4, 0.3D);
+                        serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+                                end.x, end.y, end.z, particleCount,
+                                explosionRadius * 0.5, explosionRadius * 0.5, explosionRadius * 0.5, 0.1D);
                     }
-                }
-            } else {
-                net.minecraft.world.level.ClipContext context = new net.minecraft.world.level.ClipContext(
-                        start, end,
-                        net.minecraft.world.level.ClipContext.Block.COLLIDER,
-                        net.minecraft.world.level.ClipContext.Fluid.NONE,
-                        this
-                );
-                net.minecraft.world.phys.BlockHitResult blockHit = this.level().clip(context);
-                if (blockHit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
-                    end = blockHit.getLocation();
                 }
             }
+        }
 
-            AABB searchBox = new AABB(start, end).inflate(currentHitRadius + 1.0D);
-            Entity owner = this.getOwner();
+        AABB searchBox = new AABB(start, end).inflate(currentHitRadius + 1.0D);
+        Entity owner = this.getOwner();
 
-            for (Entity target : this.level().getEntities(this, searchBox, e -> e instanceof LivingEntity && !e.isSpectator())) {
+        Entity bitOwnerEntity = null;
+        UUID bitOwnerUUID = null;
+        if (owner instanceof RobyteBitLaserEntity bitOwner) {
+            bitOwnerEntity = bitOwner.getOwner();
+            bitOwnerUUID = bitOwner.getOwnerUUID();
+        }
 
-                if (target.is(owner) || (this.ownerUUID != null && target.getUUID().equals(this.ownerUUID))) {
-                    continue;
-                }
+        for (Entity target : this.level().getEntities(this, searchBox, e -> e instanceof LivingEntity && !e.isSpectator())) {
 
-                if (owner instanceof RobyteBitLaserEntity bitOwner) {
-                    if (target.is(bitOwner.getOwner()) || (bitOwner.getOwnerUUID() != null && target.getUUID().equals(bitOwner.getOwnerUUID()))) {
-                        continue;
-                    }
-                }
+            if (target.is(owner) || (this.ownerUUID != null && target.getUUID().equals(this.ownerUUID))) continue;
+            if (bitOwnerEntity != null && (target.is(bitOwnerEntity) || (bitOwnerUUID != null && target.getUUID().equals(bitOwnerUUID)))) continue;
 
-                AABB targetBox = target.getBoundingBox().inflate(currentHitRadius);
-                if (targetBox.clip(start, end).isPresent()) {
-                    DamageSource source = this.level().damageSources().indirectMagic(this, owner != null ? owner : this);
-                    Vec3 previousMotion = target.getDeltaMovement();
-                    target.invulnerableTime = 0;
-                    target.hurt(source, this.getDamage() * (this.isExplosive() ? 2.0F : 1.0F));
-                    target.setDeltaMovement(previousMotion);
-                }
+            AABB targetBox = target.getBoundingBox().inflate(currentHitRadius);
+            if (targetBox.clip(start, end).isPresent()) {
+                DamageSource source = this.level().damageSources().indirectMagic(this, owner != null ? owner : this);
+                Vec3 previousMotion = target.getDeltaMovement();
+                target.invulnerableTime = 0;
+                target.hurt(source, this.getDamage() * (this.isExplosive() ? 2.0F : 1.0F));
+                target.setDeltaMovement(previousMotion);
             }
         }
     }
