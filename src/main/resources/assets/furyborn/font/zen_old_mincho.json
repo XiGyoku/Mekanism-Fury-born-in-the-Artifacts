@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "furyborn:zen_old_mincho.ttf",
+      "shift": [0, 0],
+      "size": 11.0,
+      "oversample": 2.0
+    }
+  ]
+}

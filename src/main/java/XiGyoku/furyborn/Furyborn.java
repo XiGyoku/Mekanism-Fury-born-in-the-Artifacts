@@ -101,14 +101,14 @@ public class Furyborn {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
+        LOGGER.info("これで何もかも終わりだ…\n任務完了…");
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        LOGGER.info("量子コンピュータ ヴェーダが起動シークエンスに突入...");
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -118,8 +118,7 @@ public class Furyborn {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            LOGGER.info("クライアントかな？いや、違うな。\nクライアントはもっと、バァーって動くもんな...");
 
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE.get(), RobyteRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_AREA.get(), RobyteAreaRenderer::new);

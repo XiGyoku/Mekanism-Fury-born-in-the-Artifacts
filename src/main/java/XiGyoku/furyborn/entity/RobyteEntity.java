@@ -625,6 +625,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                                     laser.setDamage(this.isRebellion() ?
                                             Config.ROBYTE_REBELLION_LASER_DAMAGE.get().floatValue() :
                                             Config.ROBYTE_LASER_DAMAGE.get().floatValue());
+                                    laser.setBadAttack(this.isRebellion());
                                     laser.setOwner(this);
                                     this.level().addFreshEntity(laser);
 
@@ -645,6 +646,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             bigLaser.setDamage(this.isRebellion() ?
                                     Config.ROBYTE_REBELLION_LASER_DAMAGE.get().floatValue() :
                                     Config.ROBYTE_LASER_DAMAGE.get().floatValue());
+                            bigLaser.setBadAttack(this.isRebellion());
                             bigLaser.setOwner(this);
                             this.level().addFreshEntity(bigLaser);
                             this.allRangeBigLaser = bigLaser;
@@ -727,6 +729,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                                 laser.setDamage(this.isRebellion() ?
                                         Config.ROBYTE_REBELLION_LASER_DAMAGE.get().floatValue() :
                                         Config.ROBYTE_LASER_DAMAGE.get().floatValue());
+                                laser.setBadAttack(this.isRebellion());
                                 laser.setOwner(this);
                                 this.level().addFreshEntity(laser);
                             }
@@ -816,6 +819,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
         laser.setDamage(this.isRebellion() ?
                 Config.ROBYTE_REBELLION_LASER_DAMAGE.get().floatValue() :
                 Config.ROBYTE_LASER_DAMAGE.get().floatValue());
+        laser.setBadAttack(this.isRebellion());
         laser.setOwner(this);
         laser.setMuted(!SoundPlaying);
         this.level().addFreshEntity(laser);

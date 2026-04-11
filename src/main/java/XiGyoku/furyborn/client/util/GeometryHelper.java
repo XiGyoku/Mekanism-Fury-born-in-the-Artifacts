@@ -74,6 +74,11 @@ public class GeometryHelper {
             addVertex(consumer, matrix4f, matrix3f, cos1 * outerRadius, sin1 * outerRadius, 0, color, 1, 1, light);
             addVertex(consumer, matrix4f, matrix3f, cos2 * outerRadius, sin2 * outerRadius, 0, color, 1, 1, light);
             addVertex(consumer, matrix4f, matrix3f, cos2 * innerRadius, sin2 * innerRadius, 0, color, 0, 0, light);
+
+            addVertex(consumer, matrix4f, matrix3f, cos2 * innerRadius, sin2 * innerRadius, 0, color, 0, 0, light);
+            addVertex(consumer, matrix4f, matrix3f, cos2 * outerRadius, sin2 * outerRadius, 0, color, 1, 1, light);
+            addVertex(consumer, matrix4f, matrix3f, cos1 * outerRadius, sin1 * outerRadius, 0, color, 1, 1, light);
+            addVertex(consumer, matrix4f, matrix3f, cos1 * innerRadius, sin1 * innerRadius, 0, color, 0, 0, light);
         }
     }
 

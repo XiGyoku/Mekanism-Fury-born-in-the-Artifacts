@@ -23,6 +23,7 @@ import java.util.UUID;
 public class RobyteBitLaserEntity extends Entity {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RobyteBitLaserEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> PREDICT_FUTURE = SynchedEntityData.defineId(RobyteBitLaserEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DO_BAD_ATTACK = SynchedEntityData.defineId(RobyteBitLaserEntity.class, EntityDataSerializers.BOOLEAN);
 
     private Vec3 startPos;
     private Vec3 targetPos;
@@ -46,6 +47,7 @@ public class RobyteBitLaserEntity extends Entity {
     protected void defineSynchedData() {
         this.entityData.define(DAMAGE, 1.0F);
         this.entityData.define(PREDICT_FUTURE, false);
+        this.entityData.define(DO_BAD_ATTACK, false);
     }
 
     public void setOwner(Entity owner) {
@@ -76,6 +78,10 @@ public class RobyteBitLaserEntity extends Entity {
     }
 
     public void setMuted(boolean muted) { this.isMuted = muted; }
+
+    public boolean getBadAttack() { return this.entityData.get(DO_BAD_ATTACK); }
+
+    public void setBadAttack(boolean badAttack) { this.entityData.set(DO_BAD_ATTACK, badAttack); }
 
     public Entity getOwner() {
         if (this.cachedOwner != null && !this.cachedOwner.isRemoved()) {
@@ -123,6 +129,7 @@ public class RobyteBitLaserEntity extends Entity {
             laser.setDamage(this.getDamage());
             laser.setOwner(this);
             laser.setMuted(this.isMuted);
+            laser.setBadAttack(this.getBadAttack());
             this.level().addFreshEntity(laser);
         }
 
@@ -160,6 +167,12 @@ public class RobyteBitLaserEntity extends Entity {
         if (nbt.contains("PredictFuture")) {
             setMode(nbt.getBoolean("PredictFuture"));
         }
+        if (nbt.contains("Muted")) {
+            setMuted(nbt.getBoolean("Muted"));
+        }
+        if (nbt.contains("DoBadAttack")) {
+            setBadAttack(nbt.getBoolean("DoBadAttack"));
+        }
     }
 
     @Override protected void addAdditionalSaveData(CompoundTag nbt) {
@@ -169,6 +182,8 @@ public class RobyteBitLaserEntity extends Entity {
             nbt.putUUID("Owner", this.ownerUUID);
         }
         nbt.putBoolean("PredictFuture", isPredictFutureMode());
+        nbt.putBoolean("Muted", this.isMuted);
+        nbt.putBoolean("DoBadAttack", this.entityData.get(DO_BAD_ATTACK));
     }
 
     @Override

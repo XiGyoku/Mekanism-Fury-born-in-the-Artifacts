@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.client.item;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -54,6 +55,7 @@ public class HaloOfExolumenRenderer implements ICurioRenderer {
         poseStack.mulPose(Axis.ZP.rotationDegrees(XiGyoku.furyborn.Config.haloRotZ));
         poseStack.mulPose(Axis.YP.rotationDegrees(XiGyoku.furyborn.Config.haloRotY));
         poseStack.mulPose(Axis.XP.rotationDegrees(XiGyoku.furyborn.Config.haloRotX));
+        RenderSystem.disableCull();
 
         poseStack.pushPose();
         poseStack.translate(0, 0, -0.01F);
@@ -115,6 +117,7 @@ public class HaloOfExolumenRenderer implements ICurioRenderer {
             GeometryHelper.drawSphere(poseStack, planetConsumer, basePlanetSize, basePlanetColor, light);
             poseStack.popPose();
         }
+        RenderSystem.enableCull();
         poseStack.popPose();
     }
 }

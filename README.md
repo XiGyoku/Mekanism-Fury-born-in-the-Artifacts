@@ -14,5 +14,7 @@ Mekanism: Fury born in the Artifacts is a mod that adds new bosses for mekanism 
 
 
 # LICENSE
-Codes and Resources in this mod is under MIT license.
+Codes and Resources except Fonts in this mod is under MIT license.
 This mod uses assets from [Mekanism](https://github.com/mekanism/Mekanism) that is also under MIT license.
+Font, Zen Old Mincho is under SIL Open Font License 1.1.
+To get more information about the license, please check LICENSE File within the folder.

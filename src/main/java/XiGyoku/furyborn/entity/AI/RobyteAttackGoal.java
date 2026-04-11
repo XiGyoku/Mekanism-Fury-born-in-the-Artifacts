@@ -133,12 +133,15 @@ public class RobyteAttackGoal extends Goal {
                     if (entity != mob && entity.isAlive()) {
                         float damage = 0.0F;
                         if (mob.isRebellion() && Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get().booleanValue()) {
-                            damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                        } else {
                             damage = Float.MAX_VALUE;
+                        } else {
+                            damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
                         }
                         boolean hasHit = entity.hurt(mob.damageSources().mobAttack(mob), damage);
                         if (hasHit) {
+                            if (mob.isRebellion() && Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get().booleanValue()) {
+                                entity.setHealth(0.0F);
+                            }
                             mob.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.5F);
                             double d0 = entity.getX() - mob.getX();
                             double d2 = entity.getZ() - mob.getZ();

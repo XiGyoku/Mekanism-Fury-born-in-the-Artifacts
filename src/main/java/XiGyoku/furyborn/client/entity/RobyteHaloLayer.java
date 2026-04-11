@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.client.entity;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -43,6 +44,7 @@ public class RobyteHaloLayer extends GeoRenderLayer<RobyteEntity> {
     public void render(PoseStack poseStack, RobyteEntity animatable, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
         if (!animatable.isRebellion()) return;
         poseStack.pushPose();
+        RenderSystem.enableCull();
         poseStack.translate(0.0D, 2.5D, 0.0D);
         poseStack.scale(SCALE_GLOBAL, SCALE_GLOBAL, SCALE_GLOBAL);
         poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90.0F));
@@ -106,6 +108,7 @@ public class RobyteHaloLayer extends GeoRenderLayer<RobyteEntity> {
             GeometryHelper.drawSphere(poseStack, planetConsumer, basePlanetSize, basePlanetColor, packedLight);
             poseStack.popPose();
         }
+        RenderSystem.enableCull();
         poseStack.popPose();
     }
 }

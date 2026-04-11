@@ -29,6 +29,7 @@ public class RobyteLaserEntity extends Entity {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> EXPLOSIVE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> OVERCHARGE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DO_BAD_ATTACK = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.BOOLEAN);
 
     @Nullable private UUID ownerUUID;
     @Nullable private Entity cachedOwner;
@@ -49,6 +50,7 @@ public class RobyteLaserEntity extends Entity {
         this.entityData.define(DAMAGE, Config.ROBYTE_LASER_DAMAGE.get().floatValue());
         this.entityData.define(EXPLOSIVE, false);
         this.entityData.define(OVERCHARGE, false);
+        this.entityData.define(DO_BAD_ATTACK, false);
     }
 
     public void setRadius(float r) { this.entityData.set(RADIUS, r); }
@@ -78,6 +80,10 @@ public class RobyteLaserEntity extends Entity {
     public boolean isExplosive() {
         return this.entityData.get(EXPLOSIVE);
     }
+
+    public boolean getBadAttack() { return this.entityData.get(DO_BAD_ATTACK); }
+
+    public void setBadAttack(boolean bad) { this.entityData.set(DO_BAD_ATTACK, bad); }
 
     public void setOwner(@Nullable Entity owner) {
         if (owner != null) {
@@ -189,8 +195,16 @@ public class RobyteLaserEntity extends Entity {
             AABB targetBox = target.getBoundingBox().inflate(currentHitRadius);
             if (targetBox.clip(start, end).isPresent()) {
                 DamageSource source = this.level().damageSources().indirectMagic(this, owner != null ? owner : this);
+                LivingEntity livingTargetCasted = (LivingEntity) target;
                 Vec3 previousMotion = target.getDeltaMovement();
                 target.invulnerableTime = 0;
+                float appliedDamage = this.getDamage() * (this.isExplosive() ? 2.0F : 1.0F);
+                if (this.getBadAttack()) {
+                    float currentHealth = livingTargetCasted.getHealth();
+                    float newHealth = Math.max(0.0F, currentHealth - appliedDamage);
+                    livingTargetCasted.setHealth(newHealth);
+                    livingTargetCasted.hurt(source, appliedDamage);
+                }
                 target.hurt(source, this.getDamage() * (this.isExplosive() ? 2.0F : 1.0F));
                 target.setDeltaMovement(previousMotion);
             }
@@ -204,6 +218,7 @@ public class RobyteLaserEntity extends Entity {
         if (nbt.contains("Damage")) setDamage(nbt.getFloat("Damage"));
         if (nbt.contains("Explosive")) setExplosive(nbt.getBoolean("Explosive"));
         if (nbt.contains("Overcharge")) setOvercharge(nbt.getBoolean("Overcharge"));
+        if (nbt.contains("DoBadAttack")) setBadAttack(nbt.getBoolean("DoBadAttack"));
         if (nbt.hasUUID("Owner")) this.ownerUUID = nbt.getUUID("Owner");
     }
 
@@ -214,6 +229,7 @@ public class RobyteLaserEntity extends Entity {
         nbt.putFloat("Damage", getDamage());
         nbt.putBoolean("Explosive", isExplosive());
         nbt.putBoolean("Overcharge", isOvercharge());
+        nbt.putBoolean("DoBadAttack", getBadAttack());
         if (this.ownerUUID != null) nbt.putUUID("Owner", this.ownerUUID);
     }
 

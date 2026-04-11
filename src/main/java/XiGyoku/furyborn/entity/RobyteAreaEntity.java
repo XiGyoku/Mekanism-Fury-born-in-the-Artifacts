@@ -125,6 +125,7 @@ public class RobyteAreaEntity extends Entity {
                                 } else {
                                     if (Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get()) {
                                         player.hurt(serverLevel.damageSources().magic(), Float.MAX_VALUE);
+                                        player.setHealth(0.0F);
                                     } else {
                                         player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_REBELLION_AREA_DAMAGE.get().floatValue());
                                     }

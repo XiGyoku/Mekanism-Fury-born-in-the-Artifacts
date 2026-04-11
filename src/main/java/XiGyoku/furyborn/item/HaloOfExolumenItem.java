@@ -125,7 +125,7 @@ public class HaloOfExolumenItem extends Item implements ICurioItem {
             bit.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
             bit.setOwner(player);
             bit.setTarget(target);
-
+            bit.setBadAttack(true);
             float damagePercentage = Config.HALO_LASER_DAMAGE.get().floatValue() / 100.0F;
             bit.setDamage(target.getHealth() * damagePercentage);
 
