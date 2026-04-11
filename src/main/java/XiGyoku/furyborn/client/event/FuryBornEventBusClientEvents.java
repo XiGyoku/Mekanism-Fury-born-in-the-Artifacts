@@ -1,47 +1,61 @@
 package XiGyoku.furyborn.client.event;
 
-import XiGyoku.furyborn.client.entity.RobyteBitLaserModel;
-import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
-import XiGyoku.furyborn.client.item.ModelBusterThrower;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
+import XiGyoku.furyborn.item.FuryBornItems;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import org.lwjgl.glfw.GLFW;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.RegistryObject;
 
-@EventBusSubscriber(modid = "furyborn", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FuryBornEventBusClientEvents {
-    @SubscribeEvent
-    public static void registerOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(
-                "robyte_out_of_area_overlay",
-                (gui, guiGraphics, partialTick, width, height) -> {
-                    RobyteOutOfAreaOverlay.render(guiGraphics, partialTick);
-                }
-        );
-    }
+    private static volatile Set<Item> cachedFuryBornItems = null;
 
-    public static final KeyMapping TOGGLE_BUSTER_MODE = new KeyMapping(
-            "key.furyborn.toggle_buster_mode",
-            KeyConflictContext.IN_GAME,
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_V,
-            "key.categories.furyborn"
+    private static final List<RegistryObject<Item>> FURYBORN_REGISTRY_OBJECTS = List.of(
+            FuryBornItems.HALO_OF_EXOLUMEN
     );
 
-    @SubscribeEvent
-    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
-        event.registerLayerDefinition(ModelBusterThrower.BUSTER_THROWER_LAYER, ModelBusterThrower::createLayerDefinition);
+    private static Set<Item> buildCache() {
+        Set<Item> set = new HashSet<>();
+        for (RegistryObject<Item> ro : FURYBORN_REGISTRY_OBJECTS) {
+            if (ro.isPresent()) set.add(ro.get());
+        }
+        return Collections.unmodifiableSet(set);
     }
 
-    @SubscribeEvent
-    public static void onKeyRegister(RegisterKeyMappingsEvent event) {
-        event.register(TOGGLE_BUSTER_MODE);
+    private static Set<Item> getFuryBornItemsCache() {
+        Set<Item> local = cachedFuryBornItems;
+        if (local == null) {
+            synchronized (FuryBornEventBusClientEvents.class) {
+                local = cachedFuryBornItems;
+                if (local == null) {
+                    local = buildCache();
+                    cachedFuryBornItems = local;
+                }
+            }
+        }
+        return local;
     }
+
+    private static boolean isFurybornItem(ItemStack stack) {
+        Item item = stack.getItem();
+        return getFuryBornItemsCache().contains(item);
+    }
+
+//    @SubscribeEvent(priority = EventPriority.HIGHEST)
+//    public static void onRenderTooltipPre(RenderTooltipEvent.Pre event) {
+//        ItemStack stack = event.getItemStack();
+//        if (!isFurybornItem(stack)) return;
+//
+//        event.setCanceled(true);
+//    }
 }

@@ -1,6 +1,5 @@
 package XiGyoku.furyborn.client.event;
 
-import XiGyoku.furyborn.Furyborn;
 import XiGyoku.furyborn.item.ItemBusterThrower;
 import XiGyoku.furyborn.network.FuryBornNetwork;
 import XiGyoku.furyborn.network.PacketToggleBusterMode;
@@ -17,7 +16,7 @@ public class ClientKeyInputEvent {
 
     @SubscribeEvent
     public static void onKeyInput(InputEvent.Key event) {
-        while (FuryBornEventBusClientEvents.TOGGLE_BUSTER_MODE.consumeClick()) {
+        while (FuryBornModClientEvents.TOGGLE_BUSTER_MODE.consumeClick()) {
             Player player = Minecraft.getInstance().player;
             if (player != null) {
                 ItemStack mainHand = player.getMainHandItem();

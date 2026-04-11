@@ -215,7 +215,7 @@ public class Config {
 
     public static final ForgeConfigSpec.DoubleValue HALO_LASER_DAMAGE = BUILDER
             .comment("Damage percentage for the Halo of Exolumen's laser.")
-            .defineInRange("haloLaserDamage", 10.0, 0.1, 100.0);
+            .defineInRange("haloLaserDamage", 5.0, 0.1, 100.0);
 
     static {
         BUILDER.pop();

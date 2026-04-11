@@ -15,6 +15,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FuryBornItems {
@@ -73,5 +75,19 @@ public class FuryBornItems {
                     () -> new HaloOfExolumenItem(new Item.Properties().stacksTo(1)));
 
     public static void register(IEventBus eventBus){
+    }
+
+    private static List<Item> cachedAllItems = null;
+
+    public static List<Item> getAllItems() {
+        if (cachedAllItems == null) {
+            List<Item> list = new ArrayList<>();
+            Furyborn.ITEMS.getEntries().stream()
+                    .filter(RegistryObject::isPresent)
+                    .map(RegistryObject::get)
+                    .forEach(list::add);
+            cachedAllItems = Collections.unmodifiableList(list);
+        }
+        return cachedAllItems;
     }
 }
