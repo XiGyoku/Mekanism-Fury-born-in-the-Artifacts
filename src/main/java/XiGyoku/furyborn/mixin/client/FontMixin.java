@@ -6,7 +6,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.joml.Matrix4f;
@@ -30,17 +29,25 @@ public abstract class FontMixin {
 
     @Inject(method = "drawInBatch(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I", at = @At("HEAD"), cancellable = true)
     private void furyborn$drawInBatchString(String text, float x, float y, int color, boolean dropShadow, Matrix4f matrix, MultiBufferSource bufferSource, Font.DisplayMode displayMode, int packedLight, int backgroundColor, boolean p_273022_, CallbackInfoReturnable<Integer> cir) {
-        if (text != null && text.contains(FURYBORN_MARKER)) {
-            String cleanText = text.replace(FURYBORN_MARKER, "");
-            handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
-            cir.setReturnValue(1);
-            cir.cancel();
-        }
-        if (text != null && text.contains(FURYBORN_STARRY_MARKER)) {
-            String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
-            Font font = (Font) (Object) this;
-            cir.setReturnValue(font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor, p_273022_));
-            cir.cancel();
+        if (text != null) {
+            boolean hasFB = text.contains(FURYBORN_MARKER);
+            boolean hasFBS = text.contains(FURYBORN_STARRY_MARKER);
+
+            if (hasFB || hasFBS) {
+                String cleanText = text.replace(FURYBORN_MARKER, "").replace(FURYBORN_STARRY_MARKER, "");
+                Font font = (Font) (Object) this;
+                int resultWidth = 0;
+
+                if (hasFB) {
+                    handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
+                    resultWidth = 1;
+                } else if (hasFBS) {
+                    resultWidth = font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor, p_273022_);
+                }
+
+                cir.setReturnValue(resultWidth);
+                cir.cancel();
+            }
         }
     }
 
@@ -48,16 +55,22 @@ public abstract class FontMixin {
     private void furyborn$drawInBatchFormatted(FormattedCharSequence sequence, float x, float y, int color, boolean dropShadow, Matrix4f matrix, MultiBufferSource bufferSource, Font.DisplayMode displayMode, int packedLight, int backgroundColor, CallbackInfoReturnable<Integer> cir) {
         if (sequence != null) {
             String text = formatSeqToString(sequence);
-            if (text.contains(FURYBORN_MARKER)) {
-                String cleanText = text.replace(FURYBORN_MARKER, "");
-                handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
-                cir.setReturnValue(1);
-                cir.cancel();
-            }
-            if (text.contains(FURYBORN_STARRY_MARKER)) {
-                String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+            boolean hasFB = text.contains(FURYBORN_MARKER);
+            boolean hasFBS = text.contains(FURYBORN_STARRY_MARKER);
+
+            if (hasFB || hasFBS) {
+                String cleanText = text.replace(FURYBORN_MARKER, "").replace(FURYBORN_STARRY_MARKER, "");
                 Font font = (Font) (Object) this;
-                cir.setReturnValue(font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor));
+                int resultWidth = 0;
+
+                if (hasFB) {
+                    handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
+                    resultWidth = 1;
+                } else if (hasFBS) {
+                    resultWidth = font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor);
+                }
+
+                cir.setReturnValue(resultWidth);
                 cir.cancel();
             }
         }
@@ -67,17 +80,22 @@ public abstract class FontMixin {
     private void furyborn$drawInternalFormatted(FormattedCharSequence sequence, float x, float y, int color, boolean dropShadow, Matrix4f matrix, MultiBufferSource bufferSource, Font.DisplayMode displayMode, int packedLight, int backgroundColor, CallbackInfoReturnable<Integer> cir) {
         if (sequence != null) {
             String text = formatSeqToString(sequence);
-            if (text.contains(FURYBORN_MARKER)) {
-                String marker = text.contains(FURYBORN_MARKER) ? FURYBORN_MARKER : FURYBORN_STARRY_MARKER;
-                String cleanText = text.replace(marker, "");
-                handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
-                cir.setReturnValue(1);
-                cir.cancel();
-            }
-            if (text.contains(FURYBORN_STARRY_MARKER)) {
-                String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+            boolean hasFB = text.contains(FURYBORN_MARKER);
+            boolean hasFBS = text.contains(FURYBORN_STARRY_MARKER);
+
+            if (hasFB || hasFBS) {
+                String cleanText = text.replace(FURYBORN_MARKER, "").replace(FURYBORN_STARRY_MARKER, "");
                 Font font = (Font) (Object) this;
-                cir.setReturnValue(font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor));
+                int resultWidth = 0;
+
+                if (hasFB) {
+                    handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
+                    resultWidth = 1;
+                } else if (hasFBS) {
+                    resultWidth = font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor);
+                }
+
+                cir.setReturnValue(resultWidth);
                 cir.cancel();
             }
         }
@@ -87,16 +105,22 @@ public abstract class FontMixin {
     private void furyborn$renderFormatted(FormattedCharSequence sequence, float x, float y, int color, boolean dropShadow, Matrix4f matrix, MultiBufferSource bufferSource, Font.DisplayMode displayMode, int packedLight, int backgroundColor, CallbackInfoReturnable<Float> cir) {
         if (sequence != null) {
             String text = formatSeqToString(sequence);
-            if (text.contains(FURYBORN_MARKER)) {
-                String cleanText = text.replace(FURYBORN_MARKER, "");
-                handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
-                cir.setReturnValue(1.0f);
-                cir.cancel();
-            }
-            if (text.contains(FURYBORN_STARRY_MARKER)) {
-                String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+            boolean hasFB = text.contains(FURYBORN_MARKER);
+            boolean hasFBS = text.contains(FURYBORN_STARRY_MARKER);
+
+            if (hasFB || hasFBS) {
+                String cleanText = text.replace(FURYBORN_MARKER, "").replace(FURYBORN_STARRY_MARKER, "");
                 Font font = (Font) (Object) this;
-                cir.setReturnValue((float) font.width(cleanText));
+                float resultWidth = 0.0f;
+
+                if (hasFB) {
+                    handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
+                    resultWidth = 1.0f;
+                } else if (hasFBS) {
+                    resultWidth = (float) font.width(cleanText);
+                }
+
+                cir.setReturnValue(resultWidth);
                 cir.cancel();
             }
         }
