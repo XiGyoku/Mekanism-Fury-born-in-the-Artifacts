@@ -28,6 +28,7 @@
   "effect.furyborn.monitored": "監視",
   "key.categories.furyborn": "FuryBorn",
   "key.furyborn.toggle_buster_mode": "量子光線放射器 出力切替",
+  "key.furyborn.shoot_laser_bit": "レーザービットを発射する",
   "tooltip.furyborn.buster_mode": "出力: ",
   "tooltip.furyborn.buster_mode.explosion": "最大",
   "tooltip.furyborn.buster_mode.none": "通常",

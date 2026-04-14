@@ -169,6 +169,9 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue HALO_SCALE = BUILDER
             .defineInRange("haloScale", 3.0, 0.1, 10.0);
 
+    public static final ForgeConfigSpec.DoubleValue HALO_SUN_SCALE = BUILDER
+            .defineInRange("haloSunScale", 0.2, 0.1, 10.0);
+
     public static final ForgeConfigSpec.BooleanValue HALO_INDIVIDUAL_ROTATION = BUILDER
             .define("haloIndividualRotation", true);
 

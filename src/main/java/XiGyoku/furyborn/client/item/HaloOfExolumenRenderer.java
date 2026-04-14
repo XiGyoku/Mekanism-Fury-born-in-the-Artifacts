@@ -31,7 +31,7 @@ public class HaloOfExolumenRenderer implements ICurioRenderer {
             new Vector4f(0.8F, 0.2F, 1.0F, 1.0F)
     };
 
-    private static final float RADIUS_SUN = 0.4F;
+    private static final float RADIUS_SUN = Config.HALO_SUN_SCALE.get().floatValue();
     private static final float HAZE_SIZE = 0.50F;
     private static final float[] PLANET_RADII = new float[]{ 0.15F, 0.18F, 0.2F, 0.22F, 0.25F };
     private static final float[] ORBIT_SPEEDS = new float[]{ 2.5F, 1.8F, 1.4F, 1.1F, 0.9F };

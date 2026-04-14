@@ -20,5 +20,9 @@ public class FuryBornNetwork {
                 PacketToggleBusterMode::toBytes,
                 PacketToggleBusterMode::new,
                 PacketToggleBusterMode::handle);
+        CHANNEL.registerMessage(id++, PacketShootLaserBit.class,
+                PacketShootLaserBit::toBytes,
+                PacketShootLaserBit::new,
+                PacketShootLaserBit::handle);
     }
 }

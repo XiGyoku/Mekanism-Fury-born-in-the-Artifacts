@@ -34,6 +34,14 @@ public class FuryBornModClientEvents {
             "key.categories.furyborn"
     );
 
+    public static final KeyMapping SHOOT_LASER_BIT = new KeyMapping(
+            "key.furyborn.shoot_laser_bit",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_B,
+            "key.categories.furyborn"
+    );
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
@@ -42,6 +50,8 @@ public class FuryBornModClientEvents {
 
     @SubscribeEvent
     public static void onKeyRegister(RegisterKeyMappingsEvent event) {
+
         event.register(TOGGLE_BUSTER_MODE);
+        event.register(SHOOT_LASER_BIT);
     }
 }
