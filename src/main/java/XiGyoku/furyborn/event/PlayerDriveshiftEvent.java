@@ -5,6 +5,7 @@ import XiGyoku.furyborn.item.SystemXrossAliveItem;
 import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -15,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -67,7 +68,7 @@ public class PlayerDriveshiftEvent {
             isActive = false;
         }
 
-        float progress = player.getPersistentData().getFloat(DRIVESHIFT_FADE_PROGRESS);
+        float progress = player.getPersistentData().contains(DRIVESHIFT_FADE_PROGRESS) ? player.getPersistentData().getFloat(DRIVESHIFT_FADE_PROGRESS) : 0.0f;
         if (isActive) {
             progress = Math.min(1.0f, progress + 0.1f);
         } else {
@@ -109,20 +110,32 @@ public class PlayerDriveshiftEvent {
     }
 
     @SubscribeEvent
-    public static void onPlayerAttack(AttackEntityEvent event) {
-        Player player = event.getEntity();
-        if (player.getPersistentData().getBoolean("ExolumenAfterImage")) {
-            if (player.getPersistentData().getBoolean("DriveshiftAttacking")) return;
-            player.getPersistentData().putBoolean("DriveshiftAttacking", true);
+    public static void onLivingHurt(LivingHurtEvent event) {
+        if (event.getSource().getDirectEntity() instanceof Player player) {
+            if (player.level().isClientSide) return;
 
-            int driveCount = getDriveCount(player);
-            int xrossCount = getXrossCount(player);
-            int extraHits = (driveCount >= 2) ? (xrossCount >= 1 ? 8 : 4) : 2;
+            if (player.getPersistentData().getBoolean("ExolumenAfterImage")) {
+                if (player.getPersistentData().getBoolean("DriveshiftMultiHitting")) return;
 
-            for (int i = 0; i < extraHits; i++) {
-                player.attack(event.getTarget());
+                int driveCount = getDriveCount(player);
+                int xrossCount = getXrossCount(player);
+
+                int extraHits = (driveCount >= 2) ? (xrossCount >= 1 ? 8 : 4) : 2;
+
+                float damage = event.getAmount();
+                LivingEntity target = event.getEntity();
+
+                player.getPersistentData().putBoolean("DriveshiftMultiHitting", true);
+                try {
+                    for (int i = 0; i < extraHits; i++) {
+                        target.invulnerableTime = 0;
+                        target.hurt(event.getSource(), damage);
+                    }
+                    target.invulnerableTime = 0;
+                } finally {
+                    player.getPersistentData().putBoolean("DriveshiftMultiHitting", false);
+                }
             }
-            player.getPersistentData().putBoolean("DriveshiftAttacking", false);
         }
     }
 
@@ -153,7 +166,11 @@ public class PlayerDriveshiftEvent {
                         clonedProj.copyPosition(projectile);
                         clonedProj.setOwner(player);
                         Vec3 delta = projectile.getDeltaMovement();
-                        clonedProj.setDeltaMovement(delta.add((player.level().random.nextDouble() - 0.5) * 0.2, (player.level().random.nextDouble() - 0.5) * 0.2, (player.level().random.nextDouble() - 0.5) * 0.2));
+                        clonedProj.setDeltaMovement(delta.add(
+                                (player.level().random.nextDouble() - 0.5) * 0.2,
+                                (player.level().random.nextDouble() - 0.5) * 0.2,
+                                (player.level().random.nextDouble() - 0.5) * 0.2
+                        ));
                         clonedProj.getPersistentData().putBoolean("DriveshiftCloned", true);
                         event.getLevel().addFreshEntity(clonedProj);
                     }
