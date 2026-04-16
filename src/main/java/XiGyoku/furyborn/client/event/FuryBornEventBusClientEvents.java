@@ -316,34 +316,22 @@ public class FuryBornEventBusClientEvents {
         long time = System.currentTimeMillis();
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
 
-        if (mode == TooltipMode.FURYBORN) {
-            int bgColor = 0xF0100010;
-            int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
-            int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
+        int bgColor = 0xF0100010;
+        int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
+        int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
 
-            float overlayScale = 0.375F;
-            int overlayActualWidth = (int) (64 * overlayScale);
-            int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
+        float overlayScale = 0.375F;
+        int overlayActualWidth = (int) (64 * overlayScale);
+        int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
 
-            guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + bgHeight, bgColor, bgColor);
-            guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
-            guiGraphics.fillGradient(overlayX + overlayActualWidth, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
-            guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, borderColorBottom, borderColorBottom);
-            guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, borderColorTop, borderColorBottom);
-            guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, borderColorTop, borderColorBottom);
+        guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + bgHeight, bgColor, bgColor);
+        guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
+        guiGraphics.fillGradient(overlayX + overlayActualWidth, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
+        guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, borderColorBottom, borderColorBottom);
+        guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, borderColorTop, borderColorBottom);
+        guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, borderColorTop, borderColorBottom);
 
-            ColorUtil.drawEnergeticLine(guiGraphics, bgX, bgY, bgWidth, bgHeight, time);
-        } else {
-            int vanillaBg = 0xF0100010;
-            int vBorder1 = 0x505000FF;
-            int vBorder2 = 0x5028007F;
-
-            guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, vanillaBg);
-            guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + 1, vBorder1, vBorder1);
-            guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, vBorder2, vBorder2);
-            guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, vBorder1, vBorder2);
-            guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, vBorder1, vBorder2);
-        }
+        ColorUtil.drawEnergeticLine(guiGraphics, bgX, bgY, bgWidth, bgHeight, time);
 
         poseStack.pushPose();
         poseStack.translate(centerX, centerY, 0);
