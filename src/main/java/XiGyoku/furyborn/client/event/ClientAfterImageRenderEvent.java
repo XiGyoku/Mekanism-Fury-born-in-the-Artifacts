@@ -60,7 +60,7 @@ public class ClientAfterImageRenderEvent {
                 double lerpY = Mth.lerp(event.getPartialTick(), player.yo, player.getY());
                 double lerpZ = Mth.lerp(event.getPartialTick(), player.zo, player.getZ());
 
-                for (int i = 3; i < Math.min(past.size(), 20); i += 3) {
+                for (int i = 3; i < Math.min(past.size(), 10); i += 3) {
                     AfterImageData data = past.get(i);
                     float alpha = (0.6F - (i * 0.03F)) * fadeProgress * afterImageAlphaMult;
                     if (alpha <= 0.0F) continue;

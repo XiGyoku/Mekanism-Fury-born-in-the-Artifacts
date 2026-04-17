@@ -38,7 +38,7 @@ public class ClientAfterImageManager {
 
                 list.add(0, new AfterImageData(player.position(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, bodyYaw, swinging, swingTime));
 
-                if (list.size() > 20) {
+                if (list.size() > 10) {
                     list.remove(list.size() - 1);
                 }
             } else {
