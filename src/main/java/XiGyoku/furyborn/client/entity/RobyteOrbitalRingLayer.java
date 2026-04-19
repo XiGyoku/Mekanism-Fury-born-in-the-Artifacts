@@ -39,10 +39,10 @@ public class RobyteOrbitalRingLayer extends GeoRenderLayer<RobyteEntity> {
 
             DriveshiftParticleRenderer.spawnOrientedOrbitalRing(
                     pose, worldOffset, localCenter,
-                    6.5F * deathScale, 0.2F, 2, 0.05F, 0.1F, 0.6F, 1.0F,
-                    new Vector4f(1.0F, 0.2F, 0.0F, 1.0F),
+                    10.5F * deathScale, 0.2F, 250, 0.05F, 0.1F, 0.3F, 0.7F,
+                    new Vector4f(0.0F, 1.0F, 0.0F, 1.0F),
                     new Vector4f(1.0F, 1.0F, 1.0F, 0.0F),
-                    0.4F
+                    0.10F
             );
         }
     }
