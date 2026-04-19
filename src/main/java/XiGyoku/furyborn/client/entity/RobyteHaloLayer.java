@@ -44,9 +44,17 @@ public class RobyteHaloLayer extends GeoRenderLayer<RobyteEntity> {
     public void render(PoseStack poseStack, RobyteEntity animatable, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
         if (!animatable.isRebellion()) return;
 
+        float deathScale = 1.0F;
+        if (animatable.deathTime > 0) {
+            float deathProgress = ((float) animatable.deathTime + partialTick) / 140.0F;
+            if (deathProgress >= 1.0F) return;
+            deathScale = 1.0F - deathProgress;
+        }
+
         poseStack.pushPose();
         RenderSystem.disableCull();
         poseStack.translate(0.0D, 2.5D, 0.0D);
+        poseStack.scale(deathScale, deathScale, deathScale);
 
         renderOriginalHalo(poseStack, animatable, bufferSource, packedLight);
         renderGiantHalo(poseStack, animatable, bufferSource, packedLight);

@@ -14,6 +14,7 @@ public class RobyteRenderer extends GeoEntityRenderer<RobyteEntity> {
         this.withScale(2.0f);
         this.addRenderLayer(new RobyteHaloLayer(this));
         this.addRenderLayer(new RobyteAfterImageLayer(this));
+        this.addRenderLayer(new RobyteOrbitalRingLayer(this));
     }
 
     @Override

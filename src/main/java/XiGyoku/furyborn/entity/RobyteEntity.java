@@ -355,64 +355,66 @@ public class RobyteEntity extends Monster implements GeoEntity {
         super.tick();
         int multiplier = this.isRebellion() ? 10 : 1;
 
-        if (this.level().isClientSide() && !this.isDeadOrDying()) {
-            if (this.isTransamMode() || this.isRebellion()) {
-                this.pastPositions.add(0, this.position());
-                if (this.pastPositions.size() > 5) {
-                    this.pastPositions.remove(this.pastPositions.size() - 1);
+        if (this.level().isClientSide()) {
+            if (!this.isDeadOrDying()) {
+                if (this.isTransamMode() || this.isRebellion()) {
+                    this.pastPositions.add(0, this.position());
+                    if (this.pastPositions.size() > 5) {
+                        this.pastPositions.remove(this.pastPositions.size() - 1);
+                    }
+                } else if (!this.pastPositions.isEmpty()) {
+                    this.pastPositions.clear();
                 }
-            } else if (!this.pastPositions.isEmpty()) {
-                this.pastPositions.clear();
-            }
-            if (!this.hasStartedClientBgm) {
-                ClientSoundHelper.playRobyteBgm(this);
-                this.hasStartedClientBgm = true;
-            }
-
-            if (this.isTransamMode()) {
-                for (int i = 0; i < 1; i++) {
-                    double px = this.getX() + (this.random.nextDouble() - 0.5) * 4.0;
-                    double py = this.getY() + this.random.nextDouble() * 3.0;
-                    double pz = this.getZ() + (this.random.nextDouble() - 0.5) * 4.0;
-                    this.level().addParticle(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, px, py, pz, 0.0D, 0.0D, 0.0D);
+                if (!this.hasStartedClientBgm) {
+                    ClientSoundHelper.playRobyteBgm(this);
+                    this.hasStartedClientBgm = true;
                 }
-            }
 
-            int tTick = this.getTransamTick();
-            if (tTick > 0 && tTick <= 120) {
-                double radius = 10.0D;
-                double beamLength = 100.0D;
-                double progress = (double) tTick / 120.0;
-                double currentZDist = progress * beamLength;
-                net.minecraft.world.phys.Vec3 start = this.getEyePosition();
-
-                for (int angleDeg = 0; angleDeg < 360; angleDeg += 30) {
-                    this.spawnFlameBeamParticles(start, (float)angleDeg, -15.0F, radius, currentZDist, 5, tTick);
+                if (this.isTransamMode()) {
+                    for (int i = 0; i < 1; i++) {
+                        double px = this.getX() + (this.random.nextDouble() - 0.5) * 4.0;
+                        double py = this.getY() + this.random.nextDouble() * 3.0;
+                        double pz = this.getZ() + (this.random.nextDouble() - 0.5) * 4.0;
+                        this.level().addParticle(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, px, py, pz, 0.0D, 0.0D, 0.0D);
+                    }
                 }
-            }
 
-            int fTick = this.getFinalLaserTick();
-            if (fTick > 280 && fTick <= 400) {
-                int pTick = fTick - 280;
-                double radius = 30.0D;
-                double beamLength = 100.0D;
-                double progress = (double) pTick / 120.0;
-                double currentZDist = progress * beamLength;
-                net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getFinalLaserX(), this.getFinalLaserY(), this.getFinalLaserZ());
+                int tTick = this.getTransamTick();
+                if (tTick > 0 && tTick <= 120) {
+                    double radius = 10.0D;
+                    double beamLength = 100.0D;
+                    double progress = (double) tTick / 120.0;
+                    double currentZDist = progress * beamLength;
+                    net.minecraft.world.phys.Vec3 start = this.getEyePosition();
 
-                this.spawnFlameBeamParticles(start, this.getFinalLaserYaw(), this.getFinalLaserPitch(), radius, currentZDist, 10, pTick);
-            }
+                    for (int angleDeg = 0; angleDeg < 360; angleDeg += 30) {
+                        this.spawnFlameBeamParticles(start, (float)angleDeg, -15.0F, radius, currentZDist, 5, tTick);
+                    }
+                }
 
-            int arTick = this.getAllRangeTick();
-            if (arTick > 0 && arTick <= ALL_RANGE_START_DUR) {
-                double beamLength = 100.0D;
-                double progress = (double) arTick / ALL_RANGE_START_DUR;
-                double currentZDist = progress * beamLength;
-                net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getX(), this.getY() + 0.5D, this.getZ());
-                this.spawnFlameBeamParticles(start, this.getAllRangeTrackYaw(), this.getAllRangeTrackPitch(), 5.0D, currentZDist, 10, arTick);
-                for (int pitch = -60; pitch <= 60; pitch += 30) {
-                    for (int yaw = 0; yaw < 360; yaw += 45) {
-                        this.spawnFlameBeamParticles(start, (float)yaw, (float)pitch, 1.0D, currentZDist, 2, arTick);
+                int fTick = this.getFinalLaserTick();
+                if (fTick > 280 && fTick <= 400) {
+                    int pTick = fTick - 280;
+                    double radius = 30.0D;
+                    double beamLength = 100.0D;
+                    double progress = (double) pTick / 120.0;
+                    double currentZDist = progress * beamLength;
+                    net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getFinalLaserX(), this.getFinalLaserY(), this.getFinalLaserZ());
+
+                    this.spawnFlameBeamParticles(start, this.getFinalLaserYaw(), this.getFinalLaserPitch(), radius, currentZDist, 10, pTick);
+                }
+
+                int arTick = this.getAllRangeTick();
+                if (arTick > 0 && arTick <= ALL_RANGE_START_DUR) {
+                    double beamLength = 100.0D;
+                    double progress = (double) arTick / ALL_RANGE_START_DUR;
+                    double currentZDist = progress * beamLength;
+                    net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(this.getX(), this.getY() + 0.5D, this.getZ());
+                    this.spawnFlameBeamParticles(start, this.getAllRangeTrackYaw(), this.getAllRangeTrackPitch(), 5.0D, currentZDist, 10, arTick);
+                    for (int pitch = -60; pitch <= 60; pitch += 30) {
+                        for (int yaw = 0; yaw < 360; yaw += 45) {
+                            this.spawnFlameBeamParticles(start, (float)yaw, (float)pitch, 1.0D, currentZDist, 2, arTick);
+                        }
                     }
                 }
             }
@@ -951,8 +953,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.remove(Entity.RemovalReason.KILLED);
             }
         } else {
-                this.level().broadcastEntityEvent(this, (byte)60);
-                this.remove(Entity.RemovalReason.KILLED);
+            this.level().broadcastEntityEvent(this, (byte)60);
+            this.remove(Entity.RemovalReason.KILLED);
         }
     }
 
