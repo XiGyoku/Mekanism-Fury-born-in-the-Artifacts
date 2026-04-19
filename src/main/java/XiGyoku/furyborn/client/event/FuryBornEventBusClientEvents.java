@@ -2,9 +2,12 @@ package XiGyoku.furyborn.client.event;
 
 import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.Furyborn;
+import XiGyoku.furyborn.client.entity.DriveshiftParticleRenderer;
+import XiGyoku.furyborn.client.util.TargetMarkManager;
 import XiGyoku.furyborn.item.FuryBornItems;
 import XiGyoku.furyborn.client.util.ColorUtil;
 import XiGyoku.furyborn.client.util.GeometryHelper;
+import XiGyoku.furyborn.client.util.PhotonRenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -23,8 +26,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -543,5 +549,32 @@ public class FuryBornEventBusClientEvents {
         poseStack.popPose();
 
         poseStack.popPose();
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && !Minecraft.getInstance().isPaused()) {
+            DriveshiftParticleRenderer.tick();
+            TargetMarkManager.tick();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRenderLevelStage(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            PoseStack poseStack = event.getPoseStack();
+            poseStack.pushPose();
+
+            Vec3 cameraPos = event.getCamera().getPosition();
+            poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+
+            TargetMarkManager.render(poseStack, event.getPartialTick());
+
+            MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+            DriveshiftParticleRenderer.render(poseStack, bufferSource);
+            bufferSource.endBatch(PhotonRenderUtil.GLOWING_PHOTON);
+
+            poseStack.popPose();
+        }
     }
 }
