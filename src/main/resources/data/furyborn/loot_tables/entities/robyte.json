@@ -15,6 +15,29 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "name": "furyborn:halo_projector"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "furyborn:sunraiser_drive"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
           "name": "furyborn:buster_thrower"
         }
       ],

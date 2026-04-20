@@ -29,6 +29,8 @@
   "item.furyborn.halo_of_exolumen_desc3": "§8闘争は星を破壊し、開拓者は空の彼方へ飛び去った。",
   "item.furyborn.halo_of_exolumen_desc4": "§8星の未来は今、あなたの手の内に。",
   "item.furyborn.halo_of_exolumen_desc5": "§4§l[権限規定により表示不可]",
+  "block.furyborn.halo_projector": "機星プロジェクター",
+  "block.furyborn.halo_projector_desc": "前世紀を映し出す映写装置。宇宙世紀の記録が保存されている。",
   "effect.furyborn.monitored": "監視",
   "key.categories.furyborn": "FuryBorn",
   "key.furyborn.toggle_buster_mode": "量子光線放射器 出力切替",

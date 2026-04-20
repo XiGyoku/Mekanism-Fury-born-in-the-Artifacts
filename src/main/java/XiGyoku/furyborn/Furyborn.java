@@ -1,6 +1,7 @@
 package XiGyoku.furyborn;
 
 import XiGyoku.furyborn.block.FuryBornBlocks;
+import XiGyoku.furyborn.blockentity.FuryBornBlockEntities;
 import XiGyoku.furyborn.client.entity.*;
 import XiGyoku.furyborn.client.item.HaloOfExolumenRenderer;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
@@ -64,6 +65,7 @@ public class Furyborn {
         output.accept(FuryBornItems.ROBYTE_SPAWN_EGG.get());
         output.accept(FuryBornItems.SUNRAISER_DRIVE.get());
         output.accept(FuryBornItems.SYSTEM_XROSSALIVE.get());
+        output.accept(FuryBornItems.HALO_PROJECTOR_ITEM.get());
     }).build());
 
     public Furyborn() {
@@ -79,6 +81,7 @@ public class Furyborn {
         // Custom Registration
         FuryBornBlocks.register(modEventBus);
         FuryBornItems.register(modEventBus);
+        FuryBornBlockEntities.register(modEventBus);
         FuryBornEffects.register(modEventBus);
         FuryBornSounds.register(modEventBus);
         FuryBornNetwork.register();

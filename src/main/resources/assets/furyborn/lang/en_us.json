@@ -29,6 +29,8 @@
   "item.furyborn.halo_of_exolumen_desc3": "§8The war tore the stars apart, and the pioneers fled beyond the sky.",
   "item.furyborn.halo_of_exolumen_desc4": "§8The future of the stars is now in your hands.",
   "item.furyborn.halo_of_exolumen_desc5": "§4§l[CENSORED]",
+  "block.furyborn.halo_projector": "Halo Projector",
+  "block.furyborn.halo_projector_desc": "A projection device that displays the last century. Records of the Universal Century are stored inside.",
   "effect.furyborn.monitored": "Monitored",
   "key.categories.furyborn": "FuryBorn",
   "key.furyborn.toggle_buster_mode": "Toggle Buster Mode",

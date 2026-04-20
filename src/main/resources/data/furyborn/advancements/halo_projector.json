@@ -1,13 +1,13 @@
 {
   "display": {
     "icon": {
-      "item": "furyborn:system_xrossalive"
+      "item": "furyborn:halo_projector"
     },
     "title": {
-      "text": "クロスアライブ...俺を導いてくれ..."
+      "text": "黒歴史上映会"
     },
     "description": {
-      "text": "システムクロスアライブを手に入れる。"
+      "text": "機星プロジェクターを手に入れる。"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,
@@ -22,7 +22,7 @@
         "items": [
           {
             "items": [
-              "furyborn:system_xrossalive"
+              "furyborn:halo_projector"
             ]
           }
         ]

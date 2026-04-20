@@ -5,6 +5,11 @@ import XiGyoku.furyborn.item.SystemXrossAliveItem;
 import XiGyoku.furyborn.network.FuryBornNetwork;
 import XiGyoku.furyborn.network.PacketSyncAfterImage;
 import XiGyoku.furyborn.sound.FuryBornSounds;
+import mekanism.api.Action;
+import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.math.FloatingLong;
+import mekanism.common.item.gear.ItemMekaSuitArmor;
+import mekanism.common.util.StorageUtils;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,6 +38,9 @@ public class PlayerDriveshiftEvent {
     private static final UUID DRIVESHIFT_DAMAGE_ID = UUID.fromString("2f3d4e5c-6b7a-8f9e-0d1c-2b3a4f5e6d7c");
     private static final UUID DRIVESHIFT_ARMOR_ID = UUID.fromString("3f4d5e6c-7b8a-9f0e-1d2c-3b4a5f6e7d8c");
 
+    private static final FloatingLong COST_PER_SECOND = FloatingLong.createConst(1_000_000_000L);
+    private static final FloatingLong COST_PER_TICK = FloatingLong.createConst(50_000_000L);
+
     public static int getDriveCount(Player player) {
         AtomicInteger count = new AtomicInteger(0);
         CuriosApi.getCuriosHelper().getEquippedCurios(player).ifPresent(handler -> {
@@ -53,6 +61,70 @@ public class PlayerDriveshiftEvent {
             }
         });
         return count.get();
+    }
+
+    public static boolean checkAndConsumeEnergy(Player player, FloatingLong cost, Action action) {
+        final FloatingLong remainingCost = cost.copy();
+
+        CuriosApi.getCuriosHelper().getEquippedCurios(player).ifPresent(handler -> {
+            for (int i = 0; i < handler.getSlots() && remainingCost.greaterThan(FloatingLong.ZERO); i++) {
+                ItemStack stack = handler.getStackInSlot(i);
+                if (stack.getItem() instanceof SunRaiserDriveItem) {
+                    IEnergyContainer container = StorageUtils.getEnergyContainer(stack, 0);
+                    if (container != null) {
+                        FloatingLong currentEnergy = container.getEnergy();
+                        FloatingLong toExtract = remainingCost.min(currentEnergy);
+                        if (toExtract.greaterThan(FloatingLong.ZERO)) {
+                            if (action == Action.EXECUTE) {
+                                container.setEnergy(currentEnergy.copy().minusEqual(toExtract));
+                            }
+                            remainingCost.minusEqual(toExtract);
+                        }
+                    }
+                }
+            }
+        });
+
+        if (remainingCost.greaterThan(FloatingLong.ZERO)) {
+            for (ItemStack stack : player.getArmorSlots()) {
+                if (stack.getItem() instanceof ItemMekaSuitArmor) {
+                    IEnergyContainer container = StorageUtils.getEnergyContainer(stack, 0);
+                    if (container != null) {
+                        FloatingLong currentEnergy = container.getEnergy();
+                        FloatingLong toExtract = remainingCost.min(currentEnergy);
+                        if (toExtract.greaterThan(FloatingLong.ZERO)) {
+                            if (action == Action.EXECUTE) {
+                                container.setEnergy(currentEnergy.copy().minusEqual(toExtract));
+                            }
+                            remainingCost.minusEqual(toExtract);
+                        }
+                        if (remainingCost.smallerOrEqual(FloatingLong.ZERO)) break;
+                    }
+                }
+            }
+        }
+
+        if (remainingCost.greaterThan(FloatingLong.ZERO)) {
+            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                ItemStack stack = player.getInventory().getItem(i);
+                if (!stack.isEmpty()) {
+                    IEnergyContainer container = StorageUtils.getEnergyContainer(stack, 0);
+                    if (container != null) {
+                        FloatingLong currentEnergy = container.getEnergy();
+                        FloatingLong toExtract = remainingCost.min(currentEnergy);
+                        if (toExtract.greaterThan(FloatingLong.ZERO)) {
+                            if (action == Action.EXECUTE) {
+                                container.setEnergy(currentEnergy.copy().minusEqual(toExtract));
+                            }
+                            remainingCost.minusEqual(toExtract);
+                        }
+                        if (remainingCost.smallerOrEqual(FloatingLong.ZERO)) break;
+                    }
+                }
+            }
+        }
+
+        return remainingCost.smallerOrEqual(FloatingLong.ZERO);
     }
 
     @SubscribeEvent
@@ -86,6 +158,16 @@ public class PlayerDriveshiftEvent {
             isActive = false;
             if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                 FuryBornNetwork.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketSyncAfterImage(false));
+            }
+        }
+
+        if (isActive) {
+            if (!player.isCreative() && !checkAndConsumeEnergy(player, COST_PER_TICK, Action.EXECUTE)) {
+                player.getPersistentData().putBoolean("ExolumenAfterImage", false);
+                isActive = false;
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    FuryBornNetwork.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketSyncAfterImage(false));
+                }
             }
         }
 

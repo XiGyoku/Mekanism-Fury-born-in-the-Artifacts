@@ -11,6 +11,7 @@ import org.joml.Vector4f;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
+import net.minecraft.util.Mth;
 
 public class RobyteOrbitalRingLayer extends GeoRenderLayer<RobyteEntity> {
     public RobyteOrbitalRingLayer(GeoEntityRenderer<RobyteEntity> entityRendererIn) {
@@ -19,15 +20,15 @@ public class RobyteOrbitalRingLayer extends GeoRenderLayer<RobyteEntity> {
 
     @Override
     public void render(PoseStack poseStack, RobyteEntity animatable, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
-        if (!animatable.isRebellion()) return;
-
         float deathScale = 1.0F;
         if (animatable.deathTime > 0) {
             deathScale = 1.0F - (((float) animatable.deathTime + partialTick) / 140.0F);
             if (deathScale < 0.0F) deathScale = 0.0F;
         }
 
-        if (deathScale > 0.0F) {
+        float currentScale = Mth.lerp(partialTick, animatable.prevRingScale, animatable.ringScale);
+
+        if (deathScale > 0.0F && currentScale > 0.0F) {
             Matrix4f pose = new Matrix4f();
             float time = (float) animatable.tickCount + partialTick;
             pose.rotateX(time * 0.15F);
@@ -39,7 +40,7 @@ public class RobyteOrbitalRingLayer extends GeoRenderLayer<RobyteEntity> {
 
             DriveshiftParticleRenderer.spawnOrientedOrbitalRing(
                     pose, worldOffset, localCenter,
-                    10.5F * deathScale, 0.2F, 250, 0.05F, 0.1F, 0.3F, 0.7F,
+                    10.5F * deathScale * currentScale, 0.2F * currentScale, 250, 0.05F, 0.1F, 0.3F, 0.7F,
                     new Vector4f(0.0F, 1.0F, 0.0F, 1.0F),
                     new Vector4f(1.0F, 1.0F, 1.0F, 0.0F),
                     0.10F

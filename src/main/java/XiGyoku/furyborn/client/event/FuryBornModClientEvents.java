@@ -5,6 +5,8 @@ import XiGyoku.furyborn.client.entity.SunRaiserDriveModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
 import XiGyoku.furyborn.client.gui.DriveshiftTintOverlay;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
+import XiGyoku.furyborn.client.util.HaloProjectorRenderer;
+import XiGyoku.furyborn.blockentity.FuryBornBlockEntities;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
@@ -80,6 +82,14 @@ public class FuryBornModClientEvents {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
         event.registerLayerDefinition(ModelBusterThrower.BUSTER_THROWER_LAYER, ModelBusterThrower::createLayerDefinition);
         event.registerLayerDefinition(SunRaiserDriveModel.LAYER_LOCATION, SunRaiserDriveModel::createBodyLayer);
+    }
+
+    @SubscribeEvent
+    public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(
+                FuryBornBlockEntities.HALO_PROJECTOR.get(),
+                HaloProjectorRenderer::new
+        );
     }
 
     @SubscribeEvent

@@ -7,11 +7,13 @@ import java.util.Map;
 
 public class FuryBornRarities {
     public static final Rarity STARRY = Rarity.create("STARRY", ChatFormatting.WHITE);
+    public static final Rarity RED_STARRY = Rarity.create("RED_STARRY", ChatFormatting.RED);
 
     private static final Map<Rarity, Integer> CUSTOM_RARITY_COLORS = new HashMap<>();
 
     static {
         CUSTOM_RARITY_COLORS.put(STARRY, 0x5AFF19);
+        CUSTOM_RARITY_COLORS.put(RED_STARRY, 0xFF0000);
     }
 
     public static int getColor(Rarity rarity) {

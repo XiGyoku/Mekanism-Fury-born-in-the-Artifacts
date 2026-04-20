@@ -4,6 +4,7 @@ import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.client.sound.ClientSoundHelper;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
+import XiGyoku.furyborn.item.FuryBornItems;
 import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -93,6 +94,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public int transamCooldown = 0;
     public int actionCount = 0;
+
+    public float ringScale = 0.0F;
+    public float prevRingScale = 0.0F;
 
     private final java.util.List<RobyteLaserEntity> allRangeSmallLasers = new java.util.ArrayList<>();
     private final java.util.List<Float> smallLaserInitialYaws = new java.util.ArrayList<>();
@@ -197,7 +201,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
     protected void dropCustomDeathLoot(net.minecraft.world.damagesource.DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
         if (this.isRebellion()) {
-            this.spawnAtLocation(XiGyoku.furyborn.item.FuryBornItems.HALO_OF_EXOLUMEN.get());
+            this.spawnAtLocation(FuryBornItems.HALO_OF_EXOLUMEN.get());
+            this.spawnAtLocation(FuryBornItems.SYSTEM_XROSSALIVE.get());
         }
     }
 
@@ -355,6 +360,23 @@ public class RobyteEntity extends Monster implements GeoEntity {
         super.tick();
         int multiplier = this.isRebellion() ? 10 : 1;
 
+        this.prevRingScale = this.ringScale;
+        float targetScale = 0.0F;
+        if (this.isRebellion()) {
+            if (this.attackCooldown > 0 || this.hasEnteredFinalPhase()) {
+                targetScale = 1.0F;
+            }
+        } else {
+            if (this.attackCooldown > 0 && !this.isTransamMode()) {
+                targetScale = 0.5F;
+            }
+        }
+        if (this.ringScale < targetScale) {
+            this.ringScale = Math.min(targetScale, this.ringScale + 0.1F);
+        } else if (this.ringScale > targetScale) {
+            this.ringScale = Math.max(targetScale, this.ringScale - 0.1F);
+        }
+
         if (this.level().isClientSide()) {
             if (!this.isDeadOrDying()) {
                 if (this.isTransamMode() || this.isRebellion()) {
@@ -421,6 +443,31 @@ public class RobyteEntity extends Monster implements GeoEntity {
         }
 
         if (!this.level().isClientSide()) {
+            if (this.isRebellion()) {
+                if (this.attackCooldown > 0 || this.hasEnteredFinalPhase()) {
+                    double radius = 10.5D;
+                    for (LivingEntity e : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius))) {
+                        if (e != this && e.isAlive() && this.distanceToSqr(e) <= radius * radius) {
+                            e.setHealth(e.getHealth() - 5.0F);
+                            if (e.getHealth() <= 0.0F) {
+                                e.die(this.damageSources().mobAttack(this));
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (this.attackCooldown > 0 && !this.isTransamMode()) {
+                    if (this.tickCount % 10 == 0) {
+                        double radius = 5.25D;
+                        for (LivingEntity e : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius))) {
+                            if (e != this && e.isAlive() && this.distanceToSqr(e) <= radius * radius) {
+                                e.hurt(this.damageSources().mobAttack(this), 0.5F);
+                            }
+                        }
+                    }
+                }
+            }
+
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
             if (!this.hasSummonedArea) {
                 RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
@@ -960,6 +1007,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        if (this.isRebellion() && source.getEntity() != null && source.getEntity() != this) {
+            amount = Math.max(0.0F, amount - 50.0F);
+            if (amount <= 0.0F) {
+                return false;
+            }
+        }
         if (!this.isDeadOrDying() && source.getEntity() instanceof Player player) {
             if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
                 player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));

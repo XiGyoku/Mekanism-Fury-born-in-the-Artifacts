@@ -44,5 +44,9 @@ public class FuryBornNetwork {
                 PacketSyncAfterImage::toBytes,
                 PacketSyncAfterImage::new,
                 PacketSyncAfterImage::handle);
+        CHANNEL.registerMessage(id++, PacketUpdateHaloProjector.class,
+                PacketUpdateHaloProjector::toBytes,
+                PacketUpdateHaloProjector::new,
+                PacketUpdateHaloProjector::handle);
     }
 }

@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "HEL",
+    "BPF",
+    "CEC"
+  ],
+  "key": {
+    "H": {
+      "item": "mekanism:mekasuit_helmet"
+    },
+    "B": {
+      "item": "mekanism:mekasuit_bodyarmor"
+    },
+    "L": {
+      "item": "mekanism:mekasuit_pants"
+    },
+    "F": {
+      "item": "mekanism:mekasuit_boots"
+    },
+    "E": {
+      "item": "furyborn:sunraiser_drive"
+    },
+    "P": {
+      "item": "mekanism:module_teleportation_unit"
+    },
+    "C": {
+      "item": "furyborn:null_datamodel"
+    }
+  },
+  "result": {
+    "item": "furyborn:system_xrossalive"
+  }
+}

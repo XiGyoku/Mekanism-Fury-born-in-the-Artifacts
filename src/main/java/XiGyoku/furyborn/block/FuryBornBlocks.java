@@ -16,6 +16,11 @@ public class FuryBornBlocks {
                     .sound(SoundType.METAL)
                     .noOcclusion()));
 
+    public static final RegistryObject<Block> HALO_PROJECTOR = registerBlock("halo_projector",
+            () -> new HaloProjectorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()));
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         return Furyborn.BLOCKS.register(name, block);
     }

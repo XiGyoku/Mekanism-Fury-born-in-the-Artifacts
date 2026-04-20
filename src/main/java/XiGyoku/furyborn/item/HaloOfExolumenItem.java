@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.SlotContext;
@@ -79,6 +80,17 @@ public class HaloOfExolumenItem extends Item implements ICurioItem {
                         });
                     }
                 }
+
+                CuriosApi.getCuriosHelper().getEquippedCurios(player).ifPresent(handler -> {
+                    for (int i = 0; i < handler.getSlots(); i++) {
+                        ItemStack curioStack = handler.getStackInSlot(i);
+                        if (!curioStack.isEmpty()) {
+                            curioStack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> {
+                                energy.receiveEnergy(Integer.MAX_VALUE, false);
+                            });
+                        }
+                    }
+                });
             }
         }
 

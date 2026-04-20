@@ -31,9 +31,19 @@ public class FuryBornItems {
                         }
                     });
 
+    public static final RegistryObject<Item> HALO_PROJECTOR_ITEM =
+            Furyborn.ITEMS.register("halo_projector",
+                    () -> new BlockItem(FuryBornBlocks.HALO_PROJECTOR.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.halo_projector_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
     public static final RegistryObject<Item> ROBIT_DATA_MODEL =
             Furyborn.ITEMS.register("robit_datamodel",
-                    () -> new Item(new Item.Properties()) {
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.STARRY)) {
                         @Override
                         public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                             super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
@@ -43,7 +53,7 @@ public class FuryBornItems {
 
     public static final RegistryObject<Item> NULL_DATA_MODEL =
             Furyborn.ITEMS.register("null_datamodel",
-                    () -> new Item(new Item.Properties()) {
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.RED_STARRY)) {
                         @Override
                         public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                             super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
@@ -53,7 +63,7 @@ public class FuryBornItems {
 
     public static final RegistryObject<Item> ROBYTE_DATA_MODEL =
             Furyborn.ITEMS.register("robyte_datamodel",
-                    () -> new Item(new Item.Properties()) {
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.RED_STARRY)) {
                         @Override
                         public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                             super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
