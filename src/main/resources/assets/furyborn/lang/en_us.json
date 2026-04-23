@@ -55,6 +55,10 @@
   "key.categories.furyborn": "FuryBorn",
   "key.furyborn.toggle_buster_mode": "Toggle Buster Mode",
   "key.furyborn.shoot_laser_bit": "Shoot Laser Bit",
+  "key.furyborn.driveshift_backstab": "Drive Shift: Quantum Teleport (Back)",
+  "key.furyborn.driveshift_teleport": "Drive Shift: Quantum Teleport",
+  "key.furyborn.toggle_afterimage": "Drive Shift",
+
   "tooltip.furyborn.buster_mode": "Mode: ",
   "tooltip.furyborn.buster_mode.explosion": "Explosion",
   "tooltip.furyborn.buster_mode.none": "Normal",
