@@ -64,7 +64,7 @@ public class ExolumenControllerRenderer implements BlockEntityRenderer<ExolumenC
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
                 if (Math.abs(x) == 2 || Math.abs(z) == 2) {
-                    Vec3 absStart = new Vec3(absoluteCenter.x + x, absoluteCenter.y + 1.0, absoluteCenter.z + z);
+                    Vec3 absStart = new Vec3(absoluteCenter.x + x, absoluteCenter.y + 2.0, absoluteCenter.z + z);
                     Vec3 relStart = absStart.subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
 
                     BoltEffect bolt = new BoltEffect(BoltEffect.BoltRenderInfo.ELECTRICITY, relStart, targetCenter, 10)

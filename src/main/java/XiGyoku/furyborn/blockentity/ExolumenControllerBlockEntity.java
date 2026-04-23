@@ -288,6 +288,7 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
                 sl.sendParticles(ParticleTypes.FLAME, rX, rY, rZ, 30, 0.5, 0.5, 0.5, 0.2);
 
                 this.targetRobit.discard();
+                this.targetRobit = null;
             }
         }
 

@@ -36,8 +36,12 @@ public class RobitAfterImageLayer<M extends EntityModel<EntityRobit>> extends Re
         }
 
         if (!fusingStartTickMap.containsKey(robit)) fusingStartTickMap.put(robit, robit.tickCount);
+
         int fusingTicks = robit.tickCount - fusingStartTickMap.get(robit);
-        float baseAlpha = Math.max(0.0f, 1.0f - (fusingTicks / 80.0f));
+        float progress = Math.min(1.0f, fusingTicks / 40.0f);
+        float scale = Math.max(0.0f, 1.0f - progress);
+        float baseAlpha = Math.max(0.0f, 1.0f - progress);
+        float gb = Math.max(0.1f, 1.0f - progress);
 
         LinkedList<Vec3> pastPositions = pastPositionsMap.computeIfAbsent(robit, k -> new LinkedList<>());
         Vec3 currentPos = robit.getPosition(partialTick);
@@ -52,15 +56,19 @@ public class RobitAfterImageLayer<M extends EntityModel<EntityRobit>> extends Re
         VertexConsumer vertexConsumer = bufferSource.getBuffer(translucentType);
 
         poseStack.pushPose();
-        getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1.0f, 0.1f, 0.1f, baseAlpha);
+        poseStack.translate(0.0D, 0.75D * (1.0F - scale), 0.0D);
+        poseStack.scale(scale, scale, scale);
+        getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1.0f, gb, gb, baseAlpha);
         poseStack.popPose();
 
         for (int i = 0; i < pastPositions.size(); i++) {
             poseStack.pushPose();
             Vec3 past = pastPositions.get(i);
             poseStack.translate(past.x - currentPos.x, past.y - currentPos.y, past.z - currentPos.z);
+            poseStack.translate(0.0D, 0.75D * (1.0F - scale), 0.0D);
+            poseStack.scale(scale, scale, scale);
             float alpha = (0.4f - (i * 0.05f)) * baseAlpha;
-            getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1.0f, 0.3f, 0.3f, Math.max(0, alpha));
+            getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1.0f, gb, gb, Math.max(0, alpha));
             poseStack.popPose();
         }
     }
