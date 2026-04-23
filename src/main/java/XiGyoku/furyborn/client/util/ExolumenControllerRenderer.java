@@ -38,22 +38,19 @@ public class ExolumenControllerRenderer implements BlockEntityRenderer<ExolumenC
 
         Vec3 absoluteCenter = new Vec3(centerPos.getX() + 0.5, centerPos.getY(), centerPos.getZ() + 0.5);
         Vec3 relativeCenter = absoluteCenter.subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
-        Vec3 effectCenter = new Vec3(relativeCenter.x, 4.0, relativeCenter.z);
+        Vec3 effectCenter = new Vec3(relativeCenter.x, 4.5, relativeCenter.z);
 
         if (state == PortalAnimationState.CHARGING) {
             renderBoltsFromAll16Coils(entity, partialTicks, matrix, bufferSource, absoluteCenter, effectCenter, tick);
-
-            if (tick > 50) {
-                float chargeProgress = (tick - 50) / 50.0f;
-                renderFusionCore(matrix, bufferSource, partialTicks, effectCenter, 1.2f * chargeProgress, 1.0f, overlayLight);
-            }
         }
 
         if (state == PortalAnimationState.FUSING) {
-            renderFusionCore(matrix, bufferSource, partialTicks, effectCenter, 1.2f, 1.0f, overlayLight);
+            float progress = Math.min(1.0f, (tick + partialTicks) / 40.0f);
+            float coreScale = 1.2f * progress;
+            renderFusionCore(matrix, bufferSource, partialTicks, effectCenter, coreScale, 1.0f, overlayLight);
         } else if (state == PortalAnimationState.DROPPING) {
             float drop = tick / 40.0f;
-            renderFusionCore(matrix, bufferSource, partialTicks, effectCenter.add(0, -4.0 * drop, 0), 1.2f, 1.0f, overlayLight);
+            renderFusionCore(matrix, bufferSource, partialTicks, effectCenter.add(0, -4.5 * drop, 0), 1.2f, 1.0f, overlayLight);
         }
     }
 

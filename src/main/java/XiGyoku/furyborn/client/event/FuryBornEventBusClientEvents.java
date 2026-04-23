@@ -2,6 +2,8 @@ package XiGyoku.furyborn.client.event;
 
 import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.Furyborn;
+import XiGyoku.furyborn.blockentity.ExolumenControllerBlockEntity;
+import XiGyoku.furyborn.blockentity.PortalAnimationState;
 import XiGyoku.furyborn.client.entity.DriveshiftParticleRenderer;
 import XiGyoku.furyborn.client.util.TargetMarkManager;
 import XiGyoku.furyborn.item.FuryBornItems;
@@ -11,13 +13,16 @@ import XiGyoku.furyborn.client.util.PhotonRenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import mekanism.common.entity.EntityRobit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -29,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -575,6 +581,72 @@ public class FuryBornEventBusClientEvents {
             bufferSource.endBatch(PhotonRenderUtil.GLOWING_PHOTON);
 
             poseStack.popPose();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingRenderPre(RenderLivingEvent.Pre<?, ?> event) {
+        if (event.getEntity() instanceof EntityRobit robit) {
+            ExolumenControllerBlockEntity controller = ExolumenControllerBlockEntity.FUSING_ROBITS.get(robit.getUUID());
+            if (controller != null && controller.getCurrentState() == PortalAnimationState.FUSING) {
+                int tick = controller.getAnimationTick();
+                float partialTick = event.getPartialTick();
+                float progress = Math.min(1.0f, (tick + partialTick) / 40.0f);
+
+                float scale = Math.max(0.001f, 1.0f - (progress * progress * progress));
+                float spin = progress * progress * 1080.0f;
+
+                PoseStack pose = event.getPoseStack();
+                pose.pushPose();
+
+                float centerY = 0.75f;
+                pose.translate(0.0D, centerY, 0.0D);
+                pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(spin));
+                pose.scale(scale, scale, scale);
+                pose.translate(0.0D, -centerY, 0.0D);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingRenderPost(RenderLivingEvent.Post<?, ?> event) {
+        if (event.getEntity() instanceof EntityRobit robit) {
+            ExolumenControllerBlockEntity controller = ExolumenControllerBlockEntity.FUSING_ROBITS.get(robit.getUUID());
+            if (controller != null && controller.getCurrentState() == PortalAnimationState.FUSING) {
+                PoseStack pose = event.getPoseStack();
+                pose.popPose();
+
+                int tick = controller.getAnimationTick();
+                float partialTick = event.getPartialTick();
+                float progress = Math.min(1.0f, (tick + partialTick) / 40.0f);
+                float baseAlpha = Math.max(0.0f, 1.0f - progress);
+                float gb = Math.max(0.1f, 1.0f - (progress * 2.0f));
+
+                LivingEntityRenderer renderer = (LivingEntityRenderer) event.getRenderer();
+                EntityModel model = renderer.getModel();
+                ResourceLocation texture = renderer.getTextureLocation(robit);
+                RenderType type = RenderType.entityTranslucent(texture);
+                VertexConsumer buffer = event.getMultiBufferSource().getBuffer(type);
+
+                float centerY = 0.75f;
+
+                for (int i = 1; i <= 3; i++) {
+                    float delayProgress = Math.max(0.0f, (tick + partialTick - i * 2) / 40.0f);
+                    if (delayProgress > 0) {
+                        float dScale = Math.max(0.001f, 1.0f - (delayProgress * delayProgress * delayProgress));
+                        float dSpin = delayProgress * delayProgress * 1080.0f;
+                        float dAlpha = baseAlpha * (0.4f - (i * 0.1f));
+
+                        pose.pushPose();
+                        pose.translate(0.0D, centerY, 0.0D);
+                        pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(dSpin));
+                        pose.scale(dScale, dScale, dScale);
+                        pose.translate(0.0D, -centerY, 0.0D);
+                        model.renderToBuffer(pose, buffer, event.getPackedLight(), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1.0f, gb, gb, Math.max(0, dAlpha));
+                        pose.popPose();
+                    }
+                }
+            }
         }
     }
 }

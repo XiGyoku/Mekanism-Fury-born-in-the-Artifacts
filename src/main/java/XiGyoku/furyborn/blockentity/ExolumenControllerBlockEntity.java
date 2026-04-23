@@ -22,10 +22,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ExolumenControllerBlockEntity extends BlockEntity {
 
@@ -38,6 +39,8 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     private boolean isMaster = false;
     private int energyCostPerTick = 0;
 
+    public static final Map<UUID, ExolumenControllerBlockEntity> FUSING_ROBITS = new ConcurrentHashMap<>();
+
     private static final SoundEvent FUSION_SOUND = SoundEvent.createVariableRangeEvent(new ResourceLocation("mekanismgenerators", "fusion_reactor"));
 
     public ExolumenControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -45,18 +48,32 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, ExolumenControllerBlockEntity entity) {
-        if (level.getGameTime() % 40 == 0 || entity.portalCenter == null) {
-            entity.checkStructure(pos);
+        if (!level.isClientSide) {
+            if (level.getGameTime() % 40 == 0 || entity.portalCenter == null) {
+                entity.checkStructure(pos);
+            }
         }
 
         if (!entity.isMaster || entity.portalCenter == null) return;
 
-        if (entity.targetRobit == null && entity.targetRobitUUID != null && level.isClientSide) {
-            AABB searchArea = new AABB(pos).inflate(15.0);
-            for (Entity e : level.getEntities(null, searchArea)) {
-                if (e.getUUID().equals(entity.targetRobitUUID)) {
-                    entity.targetRobit = e;
-                    break;
+        if (level.isClientSide) {
+            if (entity.currentState == PortalAnimationState.FUSING && entity.targetRobitUUID != null) {
+                FUSING_ROBITS.put(entity.targetRobitUUID, entity);
+            } else if (entity.targetRobitUUID != null) {
+                FUSING_ROBITS.remove(entity.targetRobitUUID);
+            }
+        }
+
+        if (entity.targetRobit == null && entity.targetRobitUUID != null) {
+            if (level instanceof ServerLevel sl) {
+                entity.targetRobit = sl.getEntity(entity.targetRobitUUID);
+            } else {
+                AABB searchArea = new AABB(pos).inflate(15.0);
+                for (Entity e : level.getEntities(null, searchArea)) {
+                    if (e.getUUID().equals(entity.targetRobitUUID)) {
+                        entity.targetRobit = e;
+                        break;
+                    }
                 }
             }
         }
@@ -65,11 +82,6 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
             if (!level.isClientSide) {
                 entity.autoStartScan(level, pos);
             }
-            return;
-        }
-
-        if (!level.isClientSide && !entity.consumeEnergyFromPorts(level)) {
-            entity.resetSequence(level, pos);
             return;
         }
 
@@ -158,32 +170,18 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     }
 
     private void calculateEnergyCost(Level level) {
-        for (int x = -2; x <= 2; x++) {
-            if (Math.abs(x) == 2) {
-                BlockEntity be = level.getBlockEntity(portalCenter.offset(x, 0, -2));
-                if (be instanceof PortalFrameBlockEntity port) {
-                    this.energyCostPerTick = Math.max(1, port.getEnergyStored() / 280);
-                    return;
-                }
-            }
-        }
-    }
-
-    private boolean consumeEnergyFromPorts(Level level) {
+        int maxEnergy = 0;
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
                 if (Math.abs(x) == 2 || Math.abs(z) == 2) {
                     BlockEntity be = level.getBlockEntity(portalCenter.offset(x, 0, z));
                     if (be instanceof PortalFrameBlockEntity port) {
-                        if (port.getEnergyStored() < energyCostPerTick) return false;
-                        port.consumeEnergy(energyCostPerTick);
-                    } else {
-                        return false;
+                        maxEnergy = Math.max(maxEnergy, port.getEnergyStored());
                     }
                 }
             }
         }
-        return true;
+        this.energyCostPerTick = (int) Math.ceil((double) maxEnergy / 100.0);
     }
 
     private void extractRemainingEnergy(Level level) {
@@ -192,7 +190,10 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
                 if (Math.abs(x) == 2 || Math.abs(z) == 2) {
                     BlockEntity be = level.getBlockEntity(portalCenter.offset(x, 0, z));
                     if (be instanceof PortalFrameBlockEntity port) {
-                        port.consumeEnergy(port.getEnergyStored());
+                        if (port.getEnergyStored() > 0) {
+                            port.consumeEnergy(port.getEnergyStored());
+                            port.setChanged();
+                        }
                     }
                 }
             }
@@ -200,9 +201,17 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     }
 
     private void resetSequence(Level level, BlockPos pos) {
-        if (this.targetRobit instanceof LivingEntity living) {
-            living.setSecondsOnFire(0);
-            living.removeEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY);
+        if (this.targetRobit != null) {
+            if (this.targetRobit instanceof LivingEntity living) {
+                living.setSecondsOnFire(0);
+                living.removeEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY);
+            }
+            this.targetRobit.getPersistentData().remove("ExoTargeted");
+        } else if (this.targetRobitUUID != null && level instanceof ServerLevel sl) {
+            Entity e = sl.getEntity(this.targetRobitUUID);
+            if (e != null) {
+                e.getPersistentData().remove("ExoTargeted");
+            }
         }
         if (!level.isClientSide) {
             level.playSound(null, pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -223,7 +232,7 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     private void lockRobitInAir() {
         if (this.targetRobit != null && portalCenter != null) {
             this.targetRobit.setDeltaMovement(Vec3.ZERO);
-            this.targetRobit.setPos(portalCenter.getX() + 0.5, portalCenter.getY() + 5.0, portalCenter.getZ() + 0.5);
+            this.targetRobit.setPos(portalCenter.getX() + 0.5, portalCenter.getY() + 4.90, portalCenter.getZ() + 0.5);
             this.targetRobit.hasImpulse = true;
         }
     }
@@ -232,7 +241,7 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
         if (this.targetRobit != null && this.targetRobit.isAlive()) {
             double radius = Math.max(0.1, 4.0 - (animationTick * 0.05));
             double angle = animationTick * 0.2;
-            Vec3 targetPoint = new Vec3(portalCenter.getX() + 0.5 + Math.cos(angle) * radius, portalCenter.getY() + 5.0, portalCenter.getZ() + 0.5 + Math.sin(angle) * radius);
+            Vec3 targetPoint = new Vec3(portalCenter.getX() + 0.5 + Math.cos(angle) * radius, portalCenter.getY() + 4.90, portalCenter.getZ() + 0.5 + Math.sin(angle) * radius);
 
             Vec3 moveVec = targetPoint.subtract(this.targetRobit.position());
             this.targetRobit.setDeltaMovement(moveVec.scale(0.2));
@@ -254,12 +263,26 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     private void handleChargingPhase(Level level, BlockPos pos) {
         lockRobitInAir();
 
-        if (this.animationTick == 50) {
-            level.playSound(null, pos, FUSION_SOUND, SoundSource.BLOCKS, 1.0F, 1.0F);
-        }
-
         if (this.targetRobit instanceof LivingEntity living && this.animationTick > 50) {
             living.setSecondsOnFire(1);
+        }
+
+        if (!level.isClientSide) {
+            for (int x = -2; x <= 2; x++) {
+                for (int z = -2; z <= 2; z++) {
+                    if (Math.abs(x) == 2 || Math.abs(z) == 2) {
+                        BlockEntity be = level.getBlockEntity(portalCenter.offset(x, 0, z));
+                        if (be instanceof PortalFrameBlockEntity port) {
+                            int current = port.getEnergyStored();
+                            if (current > 0) {
+                                int toConsume = Math.min(this.energyCostPerTick, current);
+                                port.consumeEnergy(toConsume);
+                                port.setChanged();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (this.animationTick > 100) transitionTo(PortalAnimationState.FUSING);
@@ -267,6 +290,10 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
 
     private void handleFusingPhase(Level level, BlockPos pos) {
         lockRobitInAir();
+
+        if (this.animationTick == 1) {
+            level.playSound(null, pos, FUSION_SOUND, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
 
         if (this.targetRobit instanceof LivingEntity living) {
             living.setSecondsOnFire(1);
@@ -323,9 +350,13 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
         Vec3 centerVec = new Vec3(portalCenter.getX() + 0.5, portalCenter.getY() + 1.0, portalCenter.getZ() + 0.5);
         AABB searchArea = new AABB(centerVec.x - 6, centerVec.y - 3, centerVec.z - 6, centerVec.x + 6, centerVec.y + 6, centerVec.z + 6);
         this.targetRobit = level.getEntitiesOfClass(EntityRobit.class, searchArea).stream()
+                .filter(e -> !e.getPersistentData().getBoolean("ExoTargeted"))
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(centerVec)))
                 .orElse(null);
-        if (this.targetRobit != null) this.targetRobitUUID = this.targetRobit.getUUID();
+        if (this.targetRobit != null) {
+            this.targetRobit.getPersistentData().putBoolean("ExoTargeted", true);
+            this.targetRobitUUID = this.targetRobit.getUUID();
+        }
     }
 
     private void transitionTo(PortalAnimationState nextState) {
@@ -347,11 +378,25 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     }
 
     @Override
+    public AABB getRenderBoundingBox() {
+        return new AABB(this.getBlockPos()).inflate(15.0);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (this.targetRobitUUID != null && this.level != null && this.level.isClientSide) {
+            FUSING_ROBITS.remove(this.targetRobitUUID);
+        }
+    }
+
+    @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         currentState = PortalAnimationState.valueOf(tag.getString("State"));
         animationTick = tag.getInt("Tick");
         isMaster = tag.getBoolean("IsMaster");
+        energyCostPerTick = tag.getInt("EnergyCost");
         if (tag.contains("PortalCenter")) {
             portalCenter = BlockPos.of(tag.getLong("PortalCenter"));
         }
@@ -366,6 +411,7 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
         tag.putString("State", currentState.name());
         tag.putInt("Tick", animationTick);
         tag.putBoolean("IsMaster", isMaster);
+        tag.putInt("EnergyCost", energyCostPerTick);
         if (portalCenter != null) {
             tag.putLong("PortalCenter", portalCenter.asLong());
         }

@@ -76,7 +76,8 @@ public class PortalFrameBlockEntity extends BlockEntity {
     }
 
     public void consumeEnergy(int amount) {
-        this.energyStorage.extractEnergy(amount, false);
+        int currentEnergy = this.energyStorage.getEnergyStored();
+        this.energyStorage.setEnergy(currentEnergy - amount);
         setChanged();
     }
 }
