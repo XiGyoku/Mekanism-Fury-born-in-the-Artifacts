@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "furyborn:robyte_chip_awaken",
+  "parent": "furyborn:exolumen_portal_frame",
   "criteria": {
     "has_datamodel": {
       "trigger": "minecraft:inventory_changed",

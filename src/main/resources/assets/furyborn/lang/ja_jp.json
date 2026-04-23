@@ -49,6 +49,8 @@
   "block.furyborn.portal_frame_mek_desc": "転移門を維持するためのマシンフレーム。",
   "block.furyborn.supercharged_coil_portal": "超次元コイル",
   "block.furyborn.supercharged_coil_portal_desc": "転移門を生成するためのコイル。",
+  "dimension.furyborn.exolumen": "極光の大地",
+  "biome.furyborn.field_of_desire": "欲望の草原",
   "effect.furyborn.monitored": "監視",
   "key.categories.furyborn": "FuryBorn",
   "key.furyborn.toggle_buster_mode": "量子光線放射器 出力切替",

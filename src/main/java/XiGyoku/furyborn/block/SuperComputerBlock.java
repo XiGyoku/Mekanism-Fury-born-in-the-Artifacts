@@ -54,63 +54,6 @@ public class SuperComputerBlock extends Block {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         ItemStack heldItem = player.getItemInHand(hand);
 
-        net.minecraft.resources.ResourceKey<Level> exolumenKey = net.minecraft.resources.ResourceKey.create(
-                net.minecraft.core.registries.Registries.DIMENSION,
-                new net.minecraft.resources.ResourceLocation("furyborn", "exolumen")
-        );
-
-        if (level.dimension() == exolumenKey) {
-            if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                ServerLevel overworld = level.getServer().getLevel(Level.OVERWORLD);
-                if (overworld != null) {
-                    overworld.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-
-                    int returnY = pos.getY();
-                    boolean foundComputer = false;
-
-                    for (int y = overworld.getMaxBuildHeight(); y >= overworld.getMinBuildHeight(); y--) {
-                        BlockPos checkPos = new BlockPos(pos.getX(), y, pos.getZ());
-                        if (overworld.getBlockState(checkPos).is(this)) {
-                            returnY = y;
-                            foundComputer = true;
-                            break;
-                        }
-                    }
-
-                    if (!foundComputer) {
-                        returnY = overworld.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
-                    }
-
-                    serverPlayer.teleportTo(overworld, pos.getX() + 0.5D, returnY + 1.0D, pos.getZ() + 0.5D, serverPlayer.getYRot(), serverPlayer.getXRot());
-                }
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-
-        boolean isRobit = heldItem.is(FuryBornItems.ROBIT_DATA_MODEL.get());
-        if (isRobit) {
-            if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                ServerLevel exolumen = level.getServer().getLevel(exolumenKey);
-                if (exolumen != null) {
-                    exolumen.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-
-                    int targetY = exolumen.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
-
-                    BlockPos targetPos = new BlockPos(pos.getX(), targetY, pos.getZ());
-
-                    if (!exolumen.getBlockState(targetPos).is(this)) {
-                        exolumen.setBlockAndUpdate(targetPos.below(), FuryBornBlocks.MEK_COBBLESTONE.get().defaultBlockState());
-                        exolumen.setBlockAndUpdate(targetPos, this.defaultBlockState().setValue(FACING, state.getValue(FACING)));
-                        exolumen.setBlockAndUpdate(targetPos.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                        exolumen.setBlockAndUpdate(targetPos.above(2), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                    }
-
-                    serverPlayer.teleportTo(exolumen, targetPos.getX() + 0.5D, targetPos.getY() + 1.0D, targetPos.getZ() + 0.5D, serverPlayer.getYRot(), serverPlayer.getXRot());
-                }
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-
         boolean isRobyte = heldItem.is(FuryBornItems.ROBYTE_DATA_MODEL.get());
         boolean isNull = heldItem.is(FuryBornItems.NULL_DATA_MODEL.get());
 
