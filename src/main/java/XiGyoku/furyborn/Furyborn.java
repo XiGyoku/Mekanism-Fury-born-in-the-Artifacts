@@ -74,6 +74,7 @@ public class Furyborn {
         output.accept(FuryBornItems.PORTAL_FRAME_MEK.get());
         output.accept(FuryBornItems.ROBYTE_CHIP.get());
         output.accept(FuryBornItems.ROBYTE_CHIP_AWAKEN.get());
+        output.accept(FuryBornItems.SUPERCHAGED_COIL_PORTAL_ITEM.get());
     }).build());
 
     public Furyborn() {

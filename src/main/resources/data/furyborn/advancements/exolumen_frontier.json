@@ -7,7 +7,7 @@
       "text": "「向こう側」の世界"
     },
     "description": {
-      "text": "Exolumen Frontierに足を踏み入れる"
+      "text": "極光の天地に足を踏み入れる"
     },
     "frame": "task",
     "show_toast": true,
@@ -15,7 +15,7 @@
     "hidden": false,
     "background": "minecraft:textures/block/end_stone.png"
   },
-  "parent": "furyborn:exolumen_portal_frame",
+  "parent": "furyborn:exolumen_portal_coil",
   "criteria": {
     "entered_exolumen": {
       "trigger": "minecraft:changed_dimension",

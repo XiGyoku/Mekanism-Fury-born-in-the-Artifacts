@@ -39,7 +39,7 @@ public class ExolumenPortalBlock extends Block {
         return SHAPE;
     }
 
-    public static void generatePortalStructure(ServerLevel level, BlockPos centerPos) {
+    public static void generatePortalStructure(ServerLevel level, BlockPos centerPos, boolean isToExolumen) {
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
                 BlockPos targetPos = centerPos.offset(x, 0, z);
@@ -48,8 +48,11 @@ public class ExolumenPortalBlock extends Block {
                 } else {
                     level.setBlockAndUpdate(targetPos, FuryBornBlocks.EXOLUMEN_PORTAL.get().defaultBlockState());
                 }
-                for (int y = 1; y <= 4; y++) {
-                    level.setBlockAndUpdate(centerPos.offset(x, y, z), Blocks.AIR.defaultBlockState());
+
+                if (isToExolumen) {
+                    for (int y = 1; y <= 4; y++) {
+                        level.setBlockAndUpdate(centerPos.offset(x, y, z), Blocks.AIR.defaultBlockState());
+                    }
                 }
             }
         }
@@ -87,9 +90,6 @@ public class ExolumenPortalBlock extends Block {
             for (int z = -1; z <= 1; z++) {
                 BlockPos portalPos = center.offset(x, 0, z);
                 level.setBlockAndUpdate(portalPos, FuryBornBlocks.EXOLUMEN_PORTAL.get().defaultBlockState());
-                for (int y = 1; y <= 4; y++) {
-                    level.setBlockAndUpdate(portalPos.above(y), Blocks.AIR.defaultBlockState());
-                }
             }
         }
     }
@@ -159,7 +159,8 @@ public class ExolumenPortalBlock extends Block {
                 int targetY = targetLevel.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, portalCenter.getX(), portalCenter.getZ());
                 BlockPos targetCenter = new BlockPos(portalCenter.getX(), targetY, portalCenter.getZ());
 
-                generatePortalStructure(targetLevel, targetCenter);
+                boolean isToExolumen = targetDim == exolumenKey;
+                generatePortalStructure(targetLevel, targetCenter, isToExolumen);
 
                 player.teleportTo(targetLevel, targetCenter.getX() + 0.5D, targetCenter.getY() + 1.0D, targetCenter.getZ() + 0.5D, player.getYRot(), player.getXRot());
                 player.setPortalCooldown();

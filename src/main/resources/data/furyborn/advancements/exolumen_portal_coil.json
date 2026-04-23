@@ -1,13 +1,13 @@
 {
   "display": {
     "icon": {
-      "item": "furyborn:portal_frame_mek"
+      "item": "furyborn:supercharged_coil_portal"
     },
     "title": {
-      "text": "キラキラ！"
+      "text": "刻が見える"
     },
     "description": {
-      "text": "極光のポータルフレームを入手する。"
+      "text": "超次元コイルを入手する。"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,
@@ -22,7 +22,7 @@
         "items": [
           {
             "items": [
-              "furyborn:portal_frame_mek"
+              "furyborn:supercharged_coil_portal"
             ]
           }
         ]

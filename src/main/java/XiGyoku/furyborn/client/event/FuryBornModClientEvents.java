@@ -5,10 +5,15 @@ import XiGyoku.furyborn.client.entity.SunRaiserDriveModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
 import XiGyoku.furyborn.client.gui.DriveshiftTintOverlay;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
+import XiGyoku.furyborn.client.util.ExolumenControllerRenderer;
 import XiGyoku.furyborn.client.util.HaloProjectorRenderer;
 import XiGyoku.furyborn.blockentity.FuryBornBlockEntities;
+import XiGyoku.furyborn.client.util.RobitAfterImageLayer;
 import com.mojang.blaze3d.platform.InputConstants;
+import mekanism.common.registries.MekanismEntityTypes;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -90,6 +95,18 @@ public class FuryBornModClientEvents {
                 FuryBornBlockEntities.HALO_PROJECTOR.get(),
                 HaloProjectorRenderer::new
         );
+        event.registerBlockEntityRenderer(
+                FuryBornBlockEntities.EXOLUMEN_CONTROLLER.get(),
+                ExolumenControllerRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void addEntityLayers(EntityRenderersEvent.AddLayers event) {
+        EntityRenderer<?> renderer = event.getRenderer(MekanismEntityTypes.ROBIT.get());
+
+        if (renderer instanceof LivingEntityRenderer livingRenderer) {
+            livingRenderer.addLayer(new RobitAfterImageLayer(livingRenderer));
+        }
     }
 
     @SubscribeEvent

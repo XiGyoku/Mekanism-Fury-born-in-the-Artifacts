@@ -184,6 +184,16 @@ public class FuryBornItems {
                         }
                     });
 
+    public static final RegistryObject<Item> SUPERCHAGED_COIL_PORTAL_ITEM =
+            Furyborn.ITEMS.register("supercharged_coil_portal",
+                    () -> new BlockItem(FuryBornBlocks.SUPERCHARGED_COIL_PORTAL.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.supercharged_coil_portal_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
     public static void register(IEventBus eventBus){
     }
 

@@ -10,10 +10,10 @@
       "item": "furyborn:robyte_chip_awaken"
     },
     "T": {
-      "item": "mekanism:sps_port"
+      "item": "mekanism:supercharged_coil"
     }
   },
   "result": {
-    "item": "furyborn:portal_frame_mek"
+    "item": "furyborn:supercharged_coil_portal"
   }
 }

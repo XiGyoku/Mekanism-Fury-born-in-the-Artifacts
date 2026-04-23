@@ -47,6 +47,9 @@ public class FuryBornBlocks {
     public static final RegistryObject<Block> PORTAL_FRAME_MEK = registerBlock("portal_frame_mek",
             () -> new PortalFrameBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 
+    public static final RegistryObject<Block> SUPERCHARGED_COIL_PORTAL = registerBlock("supercharged_coil_portal",
+            () -> new SuperchargedCoilPortalBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         return Furyborn.BLOCKS.register(name, block);
     }
