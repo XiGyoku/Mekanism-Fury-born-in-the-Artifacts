@@ -263,7 +263,7 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
     private void handleChargingPhase(Level level, BlockPos pos) {
         lockRobitInAir();
 
-        if (this.targetRobit instanceof LivingEntity living && this.animationTick > 50) {
+        if (this.targetRobit instanceof LivingEntity living && this.animationTick > 20) {
             living.setSecondsOnFire(1);
         }
 
@@ -300,7 +300,7 @@ public class ExolumenControllerBlockEntity extends BlockEntity {
             living.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.INVISIBILITY, 2, 0, false, false));
         }
 
-        if (this.animationTick == 40) {
+        if (this.animationTick == 20) {
             if (!level.isClientSide && this.targetRobit != null) {
                 BlockPos robitPos = this.targetRobit.blockPosition();
                 ServerLevel sl = (ServerLevel) level;
