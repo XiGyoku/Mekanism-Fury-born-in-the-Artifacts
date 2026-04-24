@@ -80,6 +80,7 @@ public class Furyborn {
         output.accept(FuryBornItems.NANOCORE_INGOT.get());
         output.accept(FuryBornItems.RAW_NANOCORE.get());
         output.accept(FuryBornItems.UNKNOWN_CIRCUIT.get());
+        output.accept(FuryBornItems.MEKA_SUNFLOWER.get());
 
     }).build());
 

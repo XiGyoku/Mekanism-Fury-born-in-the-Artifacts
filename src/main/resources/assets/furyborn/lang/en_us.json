@@ -49,6 +49,8 @@
   "block.furyborn.mek_tall_grass_desc": "A nanomachine, that looks like tall grass.",
   "block.furyborn.mek_grass_block": "Grass Block Machine",
   "block.furyborn.mek_grass_block_desc": "A nanomachine, that looks like a grass block.",
+  "block.furyborn.meka_sunflower": "Sunflower Machine",
+  "block.furyborn.meka_sunflower_desc": "A nanomachine, that looks like a sunflower.",
   "block.furyborn.exolumen_portal": "Exolumen Portal",
   "block.furyborn.exolumen_portal_desc": "An aurora gate that, connects to a new world.",
   "block.furyborn.portal_frame_mek": "Portal Frame Machine",

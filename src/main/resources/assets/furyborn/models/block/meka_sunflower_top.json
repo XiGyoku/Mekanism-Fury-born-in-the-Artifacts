@@ -3,7 +3,8 @@
   "textures": {
     "bottom": "furyborn:block/meka_double_plant_sunflower_top",
     "front": "furyborn:block/meka_double_plant_sunflower_front",
-    "back": "furyborn:block/meka_double_plant_sunflower_back"
+    "back": "furyborn:block/meka_double_plant_sunflower_back",
+    "particle": "furyborn:block/meka_double_plant_sunflower_top"
   },
   "elements": [
     {
@@ -27,12 +28,12 @@
       }
     },
     {
-      "from": [0, 2, 8.5],
-      "to": [16, 18, 8.5],
+      "from": [0, 2, 9.0],
+      "to": [16, 18, 9.0],
       "shade": false,
       "faces": {
-        "north": {"uv": [0, 0, 16, 16], "texture": "#front"},
-        "south": {"uv": [0, 0, 16, 16], "texture": "#back"}
+        "north": {"uv": [0, 0, 16, 16], "texture": "#back"},
+        "south": {"uv": [0, 0, 16, 16], "texture": "#front"}
       }
     }
   ]

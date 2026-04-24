@@ -2,6 +2,7 @@
   "parent": "minecraft:block/cross",
   "render_type": "minecraft:cutout",
   "textures": {
-    "cross": "furyborn:block/meka_double_plant_sunflower_bottom"
+    "cross": "furyborn:block/meka_double_plant_sunflower_bottom",
+    "particle": "furyborn:block/meka_double_plant_sunflower_bottom"
   }
 }

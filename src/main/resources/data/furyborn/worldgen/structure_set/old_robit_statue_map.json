@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "furyborn:old_robit_statue",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 8,
+    "separation": 4,
+    "salt": 12345678,
+    "spread_type": "linear"
+  }
+}
