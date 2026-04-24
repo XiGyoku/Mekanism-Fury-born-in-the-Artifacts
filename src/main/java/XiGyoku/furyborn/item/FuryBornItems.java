@@ -5,10 +5,7 @@ import XiGyoku.furyborn.block.FuryBornBlocks;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -193,6 +190,61 @@ public class FuryBornItems {
                             pTooltipComponents.add(Component.translatable("block.furyborn.supercharged_coil_portal_desc").withStyle(ChatFormatting.GRAY));
                         }
                     });
+
+    public static final RegistryObject<Item> NANOCORE_INGOT =
+            Furyborn.ITEMS.register("nanocore_ingot",
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.STARRY)) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.nanocore_ingot_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> RAW_NANOCORE =
+            Furyborn.ITEMS.register("raw_nanocore",
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.STARRY)) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.raw_nanocore_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> NANOCORE_ORE_ITEM =
+            Furyborn.ITEMS.register("nanocore_ore",
+                    () -> new BlockItem(FuryBornBlocks.NANOCORE_ORE.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.nanocore_ore_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> UNKNOWN_CIRCUIT =
+            Furyborn.ITEMS.register("unknown_circuit",
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.RED_STARRY)) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.unknown_circuit_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> MEKA_SUNFLOWER =
+            Furyborn.ITEMS.register("meka_sunflower",
+                    () -> new DoubleHighBlockItem(FuryBornBlocks.MEKA_SUNFLOWER.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.meka_sunflower_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+//    public static final RegistryObject<Item> ROBIX_SPAWN_EGG =
+//            Furyborn.ITEMS.register("robix_spawn_egg",
+//                    () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBIX, 0x444444, 0xff0000,
+//                            new Item.Properties()));
 
     public static void register(IEventBus eventBus){
     }

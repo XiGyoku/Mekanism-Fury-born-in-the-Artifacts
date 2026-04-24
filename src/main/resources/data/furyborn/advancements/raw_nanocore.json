@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:raw_nanocore"
+    },
+    "title": {
+      "text": "ナノマシンの輝き！"
+    },
+    "description": {
+      "text": "ナノコア原石を手にいれる。"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:exolumen_frontier",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:raw_nanocore"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

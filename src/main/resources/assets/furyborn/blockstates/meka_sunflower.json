@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "furyborn:block/meka_sunflower_bottom"
+    },
+    "half=upper": {
+      "model": "furyborn:block/meka_sunflower_top"
+    }
+  }
+}

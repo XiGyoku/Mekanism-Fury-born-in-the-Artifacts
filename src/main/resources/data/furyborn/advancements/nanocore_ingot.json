@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:nanocore_ingot"
+    },
+    "title": {
+      "text": "文明を砂に還すモノ"
+    },
+    "description": {
+      "text": "ナノコアインゴットを手にいれる。"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:raw_nanocore",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:nanocore_ingot"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

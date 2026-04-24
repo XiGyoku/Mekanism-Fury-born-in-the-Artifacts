@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "furyborn:item/raw_nanocore"
+  }
+}
+

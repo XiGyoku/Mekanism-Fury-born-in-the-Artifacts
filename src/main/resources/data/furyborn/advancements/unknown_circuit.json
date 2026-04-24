@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:unknown_circuit"
+    },
+    "title": {
+      "text": "未知の回路"
+    },
+    "description": {
+      "text": "反物質制御基盤を手にいれる。"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:exolumen_frontier",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:unknown_circuit"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

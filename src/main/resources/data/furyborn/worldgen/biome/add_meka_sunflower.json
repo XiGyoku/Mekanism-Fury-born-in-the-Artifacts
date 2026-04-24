@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "furyborn:field_of_desire",
+  "features": "furyborn:meka_sunflower",
+  "step": "vegetal_decoration"
+}

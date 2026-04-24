@@ -42,6 +42,12 @@ public class FuryBornEntityTypes {
                             .clientTrackingRange(64)
                             .build(new ResourceLocation(Furyborn.MODID, "robyte_laser").toString()));
 
+//    public static final RegistryObject<EntityType<RobixEntity>> ROBIX =
+//            ENTITY_TYPES.register("robix",
+//                    () -> EntityType.Builder.of(RobixEntity::new, MobCategory.MONSTER)
+//                            .sized(0.6f, 1.8f)
+//                            .build("robix"));
+
     public static void register(IEventBus eventBus) {
             ENTITY_TYPES.register(eventBus);
     }

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "furyborn:block/meka_double_plant_sunflower_front"
+  }
+}

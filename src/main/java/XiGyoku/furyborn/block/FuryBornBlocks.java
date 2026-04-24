@@ -2,6 +2,7 @@ package XiGyoku.furyborn.block;
 
 import XiGyoku.furyborn.Furyborn;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.level.block.SunflowerBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -41,6 +42,9 @@ public class FuryBornBlocks {
                     .instabreak()
                     .sound(SoundType.GRASS)));
 
+    public static final RegistryObject<Block> NANOCORE_ORE = registerBlock("nanocore_ore",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE).mapColor(MapColor.STONE).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> EXOLUMEN_PORTAL = registerBlock("exolumen_portal",
             () -> new ExolumenPortalBlock());
 
@@ -49,6 +53,12 @@ public class FuryBornBlocks {
 
     public static final RegistryObject<Block> SUPERCHARGED_COIL_PORTAL = registerBlock("supercharged_coil_portal",
             () -> new SuperchargedCoilPortalBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
+
+    public static final RegistryObject<Block> MEKA_SUNFLOWER = registerBlock("meka_sunflower",
+            () -> new SunflowerBlock(BlockBehaviour.Properties.copy(Blocks.SUNFLOWER)
+                    .noCollission()
+                    .instabreak()
+                    .sound(SoundType.GRASS)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         return Furyborn.BLOCKS.register(name, block);

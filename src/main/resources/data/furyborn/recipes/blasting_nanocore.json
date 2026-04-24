@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:blasting",
+  "ingredient": {
+    "item": "furyborn:raw_nanocore"
+  },
+  "result": "furyborn:nanocore_ingot",
+  "experience": 3.0,
+  "cookingtime": 100
+}
