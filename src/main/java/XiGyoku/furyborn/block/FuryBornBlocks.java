@@ -2,11 +2,7 @@ package XiGyoku.furyborn.block;
 
 import XiGyoku.furyborn.Furyborn;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.level.block.SunflowerBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.TallGrassBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -55,7 +51,7 @@ public class FuryBornBlocks {
             () -> new SuperchargedCoilPortalBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
 
     public static final RegistryObject<Block> MEKA_SUNFLOWER = registerBlock("meka_sunflower",
-            () -> new SunflowerBlock(BlockBehaviour.Properties.copy(Blocks.SUNFLOWER)
+            () -> new TallFlowerBlock(BlockBehaviour.Properties.copy(Blocks.SUNFLOWER)
                     .noCollission()
                     .instabreak()
                     .sound(SoundType.GRASS)));
