@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "furyborn:robyte_chip_awaken",
+  "parent": "furyborn:nanocore_ingot",
   "criteria": {
     "has_datamodel": {
       "trigger": "minecraft:inventory_changed",
