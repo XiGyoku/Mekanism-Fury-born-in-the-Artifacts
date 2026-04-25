@@ -28,7 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class SuperComputerBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    public static final BooleanProperty IS_NULL = BooleanProperty.create("is_null");
+    public static final BooleanProperty IS_EXOLUMEN = BooleanProperty.create("is_exolumen");
 
     public SuperComputerBlock(Properties properties) {
         super(BlockBehaviour.Properties.of().mapColor(MapColor.STONE)
@@ -37,17 +37,17 @@ public class SuperComputerBlock extends Block {
                 .requiresCorrectToolForDrops()
                 .noOcclusion()
         );
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(IS_NULL, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(IS_EXOLUMEN, false));
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection()).setValue(IS_NULL, false);
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection()).setValue(IS_EXOLUMEN, false);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, IS_NULL);
+        builder.add(FACING, IS_EXOLUMEN);
     }
 
     @Override
@@ -55,15 +55,15 @@ public class SuperComputerBlock extends Block {
         ItemStack heldItem = player.getItemInHand(hand);
 
         boolean isRobyte = heldItem.is(FuryBornItems.ROBYTE_DATA_MODEL.get());
-        boolean isNull = heldItem.is(FuryBornItems.NULL_DATA_MODEL.get());
+        boolean isExolumen = heldItem.is(FuryBornItems.EXOLUMEN_DATAMODEL.get());
 
-        if (isRobyte || isNull) {
+        if (isRobyte || isExolumen) {
             if (!level.isClientSide) {
                 if (!player.isCreative()) {
                     heldItem.shrink(1);
                 }
-                level.setBlock(pos, state.setValue(IS_NULL, isNull), 3);
-                if (isNull) {
+                level.setBlock(pos, state.setValue(IS_EXOLUMEN, isExolumen), 3);
+                if (isExolumen) {
                     level.playSound(null, pos, FuryBornSounds.SUPERCOMPUTER_LOADING.get(), SoundSource.BLOCKS, 0.5F, 0.5F);
                 } else {
                     level.playSound(null, pos, FuryBornSounds.SUPERCOMPUTER_LOADING.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
@@ -84,12 +84,12 @@ public class SuperComputerBlock extends Block {
 
         if (robyteEntity != null) {
             robyteEntity.moveTo(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
-            if (state.getValue(IS_NULL)) {
+            if (state.getValue(IS_EXOLUMEN)) {
                 robyteEntity.setRebellion(true);
             }
             level.addFreshEntity(robyteEntity);
             level.playSound(null, pos, FuryBornSounds.ROBYTE_GETUP.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
-            level.setBlock(pos, state.setValue(IS_NULL, false), 3);
+            level.setBlock(pos, state.setValue(IS_EXOLUMEN, false), 3);
         }
     }
 }

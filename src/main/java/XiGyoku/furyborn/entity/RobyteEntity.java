@@ -1034,13 +1034,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean doHurtTarget(Entity target) {
-        boolean hurt = super.doHurtTarget(target);
-        if (!this.isDeadOrDying() && hurt && target instanceof Player player) {
-            if (!player.hasEffect(FuryBornEffects.MONITORED.get())) {
-                player.addEffect(new MobEffectInstance(FuryBornEffects.MONITORED.get(), -1, 0, false, false, true));
-            }
+        boolean didHit = super.doHurtTarget(target);
+        if (didHit && target instanceof LivingEntity livingTarget) {
+            livingTarget.invulnerableTime = 0;
+            livingTarget.hurt(this.damageSources().magic(), 1.0F);
         }
-        return hurt;
+        return didHit;
     }
 
     @Override

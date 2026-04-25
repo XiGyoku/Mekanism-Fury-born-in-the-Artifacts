@@ -14,6 +14,6 @@ public class FuryBornModEvents {
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(FuryBornEntityTypes.ROBYTE.get(), RobyteEntity.createAttributes());
-//        event.put(FuryBornEntityTypes.ROBIX.get(), RobixEntity.createAttributes().build());
+        event.put(FuryBornEntityTypes.ROBIX.get(), RobixEntity.createAttributes().build());
     }
 }

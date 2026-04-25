@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "furyborn:block/mek_tall_grass"
+    "layer0": "furyborn:item/exolumen_datamodel"
   }
 }
+

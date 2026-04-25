@@ -241,10 +241,22 @@ public class FuryBornItems {
                         }
                     });
 
-//    public static final RegistryObject<Item> ROBIX_SPAWN_EGG =
-//            Furyborn.ITEMS.register("robix_spawn_egg",
-//                    () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBIX, 0x444444, 0xff0000,
-//                            new Item.Properties()));
+    public static final RegistryObject<Item> ROBIX_SPAWN_EGG =
+            Furyborn.ITEMS.register("robix_spawn_egg",
+                    () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBIX, 0x444444, 0xff0000,
+                            new Item.Properties()));
+
+    public static final RegistryObject<Item> EXOLUMEN_DATAMODEL =
+            Furyborn.ITEMS.register("exolumen_datamodel",
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.STARRY)) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.exolumen_datamodel_desc1").withStyle(ChatFormatting.GRAY));
+                            pTooltipComponents.add(Component.translatable("item.furyborn.exolumen_datamodel_desc2").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
 
     public static void register(IEventBus eventBus){
     }

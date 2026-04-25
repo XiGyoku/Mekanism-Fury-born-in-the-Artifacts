@@ -63,7 +63,7 @@ public class Furyborn {
         output.accept(FuryBornItems.NULL_DATA_MODEL.get());
         output.accept(FuryBornItems.HALO_OF_EXOLUMEN.get());
         output.accept(FuryBornItems.ROBYTE_SPAWN_EGG.get());
-//        output.accept(FuryBornItems.ROBIX_SPAWN_EGG.get());
+        output.accept(FuryBornItems.ROBIX_SPAWN_EGG.get());
         output.accept(FuryBornItems.SUNRAISER_DRIVE.get());
         output.accept(FuryBornItems.SYSTEM_XROSSALIVE.get());
         output.accept(FuryBornItems.HALO_PROJECTOR_ITEM.get());
@@ -81,7 +81,7 @@ public class Furyborn {
         output.accept(FuryBornItems.RAW_NANOCORE.get());
         output.accept(FuryBornItems.UNKNOWN_CIRCUIT.get());
         output.accept(FuryBornItems.MEKA_SUNFLOWER.get());
-
+        output.accept(FuryBornItems.EXOLUMEN_DATAMODEL.get());
     }).build());
 
     public Furyborn() {
@@ -142,7 +142,7 @@ public class Furyborn {
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_AREA.get(), RobyteAreaRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), RobyteBitLaserRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_LASER.get(), RobyteLaserRenderer::new);
-//            EntityRenderers.register(FuryBornEntityTypes.ROBIX.get(), RobixRenderer::new);
+            EntityRenderers.register(FuryBornEntityTypes.ROBIX.get(), RobixRenderer::new);
 
             event.enqueueWork(() -> {
                 CuriosRendererRegistry.register(FuryBornItems.HALO_OF_EXOLUMEN.get(), HaloOfExolumenRenderer::new);

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "UUU",
+    "ULU",
+    "UUU"
+  ],
+  "key": {
+    "U": {
+      "item": "furyborn:unknown_circuit"
+    },
+    "L": {
+      "item": "furyborn:null_datamodel"
+    }
+  },
+  "result": {
+    "item": "furyborn:exolumen_datamodel"
+  }
+}

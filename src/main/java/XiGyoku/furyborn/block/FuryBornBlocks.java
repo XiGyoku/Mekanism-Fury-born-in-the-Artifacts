@@ -24,13 +24,13 @@ public class FuryBornBlocks {
                     .noOcclusion()));
 
     public static final RegistryObject<Block> MEK_DIRT = registerBlock("mek_dirt",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIRT).mapColor(MapColor.DIRT)));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIRT).mapColor(MapColor.DIRT).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> MEK_GRASS_BLOCK = registerBlock("mek_grass_block",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).mapColor(MapColor.GRASS)));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).mapColor(MapColor.GRASS).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> MEK_COBBLESTONE = registerBlock("mek_cobblestone",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.COBBLESTONE).mapColor(MapColor.STONE)));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.COBBLESTONE).mapColor(MapColor.STONE).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> MEK_TALL_GRASS = registerBlock("mek_tall_grass",
             () -> new TallGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS)
