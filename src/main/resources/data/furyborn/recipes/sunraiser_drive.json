@@ -2,19 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "OOO",
-    "OPO",
-    "CCC"
+    "NNN",
+    "NPN",
+    "NNN"
   ],
   "key": {
-    "O": {
-      "item": "mekanism:ingot_osmium"
+    "N": {
+      "item": "furyborn:nanocore_ingot"
     },
     "P": {
       "item": "furyborn:robyte_chip_awaken"
-    },
-    "C": {
-      "item": "furyborn:null_datamodel"
     }
   },
   "result": {

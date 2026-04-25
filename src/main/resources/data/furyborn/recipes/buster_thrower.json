@@ -3,8 +3,8 @@
   "category": "weapons",
   "pattern": [
     "LAL",
-    "RTR",
-    "LAL"
+    "NTN",
+    "NRN"
   ],
   "key": {
     "R": {
@@ -18,6 +18,9 @@
     },
     "A": {
       "item": "mekanism:laser_amplifier"
+    },
+    "N": {
+      "item": "furyborn:nanocore_ingot"
     }
   },
   "result": {

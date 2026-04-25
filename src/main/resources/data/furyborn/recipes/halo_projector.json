@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "SAS",
+    "NAN",
     "RLR",
-    "SRS"
+    "NRN"
   ],
   "key": {
     "R": {
@@ -15,8 +15,8 @@
     "A": {
       "item": "mekanism:laser_amplifier"
     },
-    "S": {
-      "item": "mekanism:steel_casing"
+    "N": {
+      "item": "furyborn:nanocore_ingot"
     }
   },
   "result": {

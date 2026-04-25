@@ -3,7 +3,7 @@
   "category": "equipment",
   "pattern": [
     "HEL",
-    "BPF",
+    "BNF",
     "CGC"
   ],
   "key": {
@@ -22,8 +22,8 @@
     "E": {
       "item": "mekanism:creative_chemical_tank"
     },
-    "P": {
-      "item": "furyborn:null_datamodel"
+    "N": {
+      "item": "furyborn:nanocore_ingot"
     },
     "G": {
       "item": "mekanism:module_gravitational_modulating_unit"
