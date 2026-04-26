@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "furyborn:t_supercomputer",
-    "furyborn:halo_projector",
     "furyborn:nanocore_ore",
+    "furyborn:mek_dirt",
+    "furyborn:mek_grass_block",
     "furyborn:mek_cobblestone"
   ]
 }
