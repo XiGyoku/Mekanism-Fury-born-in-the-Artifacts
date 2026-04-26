@@ -4,6 +4,8 @@
     "furyborn:t_supercomputer",
     "furyborn:halo_projector",
     "furyborn:nanocore_ore",
-    "furyborn:mek_cobblestone"
+    "furyborn:mek_cobblestone",
+    "furyborn:portal_frame_mek",
+    "furyborn:supercharged_coil_portal"
   ]
 }

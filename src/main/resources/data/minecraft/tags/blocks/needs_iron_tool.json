@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "furyborn:t_supercomputer",
-    "furyborn:halo_projector"
+    "furyborn:halo_projector",
+    "furyborn:portal_frame_mek",
+    "furyborn:supercharged_coil_portal"
   ]
 }
