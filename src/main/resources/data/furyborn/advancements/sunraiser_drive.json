@@ -4,10 +4,10 @@
       "item": "furyborn:sunraiser_drive"
     },
     "title": {
-      "text": "ドライヴシフトは使うなよ..."
+      "translate": "advancements.furyborn.sunraiser_drive.title"
     },
     "description": {
-      "text": "サンライザードライヴを手に入れる。"
+      "translate": "advancements.furyborn.sunraiser_drive.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

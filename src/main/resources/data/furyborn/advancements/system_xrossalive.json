@@ -4,10 +4,10 @@
       "item": "furyborn:system_xrossalive"
     },
     "title": {
-      "text": "クロスアライブ...俺を導いてくれ..."
+      "translate": "advancements.furyborn.system_xrossalive.title"
     },
     "description": {
-      "text": "システムクロスアライブを手に入れる。"
+      "translate": "advancements.furyborn.system_xrossalive.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

@@ -4,10 +4,10 @@
       "item": "furyborn:raw_nanocore"
     },
     "title": {
-      "text": "ナノマシンの輝き！"
+      "translate": "advancements.furyborn.raw_nanocore.title"
     },
     "description": {
-      "text": "ナノコア原石を手にいれる。"
+      "translate": "advancements.furyborn.raw_nanocore.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

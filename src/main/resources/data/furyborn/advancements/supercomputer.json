@@ -4,10 +4,10 @@
       "item": "furyborn:t_supercomputer"
     },
     "title": {
-      "text": "SUUUUUUUUUUUUUPER COMPUTING!!!!!!"
+      "translate": "advancements.furyborn.t_supercomputer.title"
     },
     "description": {
-      "text": "スーパーコンピューター帝を作成する。Tだよ！Kじゃないよ！"
+      "translate": "advancements.furyborn.t_supercomputer.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

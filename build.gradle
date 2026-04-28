@@ -196,6 +196,7 @@ dependencies {
     implementation fg.deobf("curse.maven:journeymap-32274:5789363")
     implementation fg.deobf("curse.maven:jade-324717:6855440")
     implementation fg.deobf("curse.maven:embeddium-908741:5681725")
+    implementation fg.deobf("curse.maven:slashblade-resharped-1022428:7363505")
     implementation fg.deobf("curse.maven:mekanism-generators-268566:6552914")
 }
 

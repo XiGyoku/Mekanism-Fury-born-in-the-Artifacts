@@ -4,10 +4,10 @@
       "item": "furyborn:exolumen_datamodel"
     },
     "title": {
-      "text": "さぁ、実験を始めようか。"
+      "translate": "advancements.furyborn.exolumen_datamodel.title"
     },
     "description": {
-      "text": "機星のデータモデルを手にいれる。"
+      "translate": "advancements.furyborn.exolumen_datamodel.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

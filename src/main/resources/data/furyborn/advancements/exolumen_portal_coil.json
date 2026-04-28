@@ -4,10 +4,10 @@
       "item": "furyborn:supercharged_coil_portal"
     },
     "title": {
-      "text": "刻が見える"
+      "translate": "advancements.furyborn.supercharged_coil_portal.title"
     },
     "description": {
-      "text": "超次元コイルを入手する。"
+      "translate": "advancements.furyborn.supercharged_coil_portal.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

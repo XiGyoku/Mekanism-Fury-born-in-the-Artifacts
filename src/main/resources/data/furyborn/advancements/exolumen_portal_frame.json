@@ -4,10 +4,10 @@
       "item": "furyborn:portal_frame_mek"
     },
     "title": {
-      "text": "キラキラ！"
+      "translate": "advancements.furyborn.portal_frame_mek.title"
     },
     "description": {
-      "text": "極光のポータルフレームを入手する。"
+      "translate": "advancements.furyborn.portal_frame_mek.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

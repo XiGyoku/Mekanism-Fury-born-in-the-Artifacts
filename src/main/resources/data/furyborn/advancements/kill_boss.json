@@ -4,10 +4,10 @@
       "item": "furyborn:robyte_datamodel"
     },
     "title": {
-      "text": "ロビ虐・真"
+      "translate": "advancements.furyborn.robyte_boss.title"
     },
     "description": {
-      "text": "暴走したロビットを倒す。"
+      "translate": "advancements.furyborn.robyte_boss.description"
     },
     "frame": "challenge",
     "show_toast": true,

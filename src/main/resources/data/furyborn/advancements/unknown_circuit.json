@@ -4,10 +4,10 @@
       "item": "furyborn:unknown_circuit"
     },
     "title": {
-      "text": "未知の回路"
+      "translate": "advancements.furyborn.unknown_circuit.title"
     },
     "description": {
-      "text": "反物質制御基盤を手にいれる。"
+      "translate": "advancements.furyborn.unknown_circuit.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

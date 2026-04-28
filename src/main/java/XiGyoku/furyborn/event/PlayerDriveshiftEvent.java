@@ -250,18 +250,31 @@ public class PlayerDriveshiftEvent {
                 int xrossCount = getXrossCount(player);
                 int extra = (driveCount >= 2) ? (xrossCount >= 1 ? 8 : 4) : 2;
 
+                Vec3 lookVec = player.getLookAngle();
+                double stepDistance = 0.5;
+
                 for (int i = 0; i < extra; i++) {
                     Entity clone = projectile.getType().create(event.getLevel());
                     if (clone instanceof Projectile clonedProj) {
                         clonedProj.copyPosition(projectile);
                         clonedProj.setOwner(player);
+
+                        Vec3 offset = lookVec.scale((i + 1) * stepDistance);
+                        double newX = projectile.getX() + offset.x;
+                        double newY = projectile.getY() + offset.y;
+                        double newZ = projectile.getZ() + offset.z;
+
+                        clonedProj.moveTo(newX, newY, newZ, projectile.getYRot(), projectile.getXRot());
+
                         Vec3 delta = projectile.getDeltaMovement();
-                        clonedProj.setDeltaMovement(delta.add(
-                                (player.level().random.nextDouble() - 0.5) * 0.2,
-                                (player.level().random.nextDouble() - 0.5) * 0.2,
-                                (player.level().random.nextDouble() - 0.5) * 0.2
-                        ));
+                        clonedProj.setDeltaMovement(delta);
+
                         clonedProj.getPersistentData().putBoolean("DriveshiftCloned", true);
+
+                        float scale = 1.0F - ((i + 1) * 0.2F);
+                        if (scale < 0.2F) scale = 0.2F;
+                        clonedProj.getPersistentData().putFloat("DriveshiftScale", scale);
+
                         event.getLevel().addFreshEntity(clonedProj);
                     }
                 }

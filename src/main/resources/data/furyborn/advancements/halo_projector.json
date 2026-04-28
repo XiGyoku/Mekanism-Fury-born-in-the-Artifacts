@@ -4,10 +4,10 @@
       "item": "furyborn:halo_projector"
     },
     "title": {
-      "text": "黒歴史上映会"
+      "translate": "advancements.furyborn.halo_projector.title"
     },
     "description": {
-      "text": "機星プロジェクターを手に入れる。"
+      "translate": "advancements.furyborn.halo_projector.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

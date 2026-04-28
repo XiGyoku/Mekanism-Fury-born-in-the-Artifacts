@@ -4,10 +4,10 @@
       "item": "furyborn:nanocore_ingot"
     },
     "title": {
-      "text": "文明を砂に還すモノ"
+      "translate": "advancements.furyborn.nanocore_ingot.title"
     },
     "description": {
-      "text": "ナノコアインゴットを手にいれる。"
+      "translate": "advancements.furyborn.nanocore_ingot.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

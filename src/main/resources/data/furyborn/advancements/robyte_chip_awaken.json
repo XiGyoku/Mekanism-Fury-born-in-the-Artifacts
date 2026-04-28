@@ -4,10 +4,10 @@
       "item": "furyborn:robyte_chip_awaken"
     },
     "title": {
-      "text": "なんの光？！"
+      "translate": "advancements.furyborn.robyte_chip_awaken.title"
     },
     "description": {
-      "text": "活性化メカチップを手にいれる。"
+      "translate": "advancements.furyborn.robyte_chip_awaken.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

@@ -4,10 +4,10 @@
       "item": "furyborn:robyte_chip"
     },
     "title": {
-      "text": "これを、ロビットの記録回路に取付けろ"
+      "translate": "advancements.furyborn.robyte_chip.title"
     },
     "description": {
-      "text": "メカチップを手にいれる。"
+      "translate": "advancements.furyborn.robyte_chip.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

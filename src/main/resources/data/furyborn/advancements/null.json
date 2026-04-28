@@ -4,10 +4,10 @@
       "item": "furyborn:null_datamodel"
     },
     "title": {
-      "text": "Aftermath"
+      "translate": "advancements.furyborn.null_datamodel.title"
     },
     "description": {
-      "text": "虚空のデータモデルを手に入れる。一切正体不明だ。"
+      "translate": "advancements.furyborn.null_datamodel.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

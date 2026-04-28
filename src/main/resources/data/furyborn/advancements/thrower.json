@@ -4,10 +4,10 @@
       "item": "furyborn:buster_thrower"
     },
     "title": {
-      "text": "Operation Meteor"
+      "translate": "advancements.furyborn.buster_thrower.title"
     },
     "description": {
-      "text": "量子光線放射器を手に入れる。五飛、教えてくれ...俺はこれをどう使えばいい？"
+      "translate": "advancements.furyborn.buster_thrower.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

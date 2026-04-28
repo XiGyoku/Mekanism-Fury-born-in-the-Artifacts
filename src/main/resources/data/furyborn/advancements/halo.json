@@ -4,10 +4,10 @@
       "item": "furyborn:halo_of_exolumen"
     },
     "title": {
-      "text": "Exolumen beyond the stars"
+      "translate": "advancements.furyborn.halo_of_exolumen.title"
     },
     "description": {
-      "text": "機星ノ赫輪を手に入れる。"
+      "translate": "advancements.furyborn.halo_of_exolumen.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

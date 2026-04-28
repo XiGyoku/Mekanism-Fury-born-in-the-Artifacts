@@ -4,10 +4,10 @@
       "item": "furyborn:robit_datamodel"
     },
     "title": {
-      "text": "Fury Born"
+      "translate": "advancements.furyborn.robit_datamodel.title"
     },
     "description": {
-      "text": "ロビットのデータモデルを手に入れる。一体何に使えるんだろう...?"
+      "translate": "advancements.furyborn.robit_datamodel.description"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,
