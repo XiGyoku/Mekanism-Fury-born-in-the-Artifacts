@@ -2,6 +2,7 @@ package XiGyoku.furyborn.event;
 
 import XiGyoku.furyborn.Furyborn;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
+import XiGyoku.furyborn.entity.RoadBikeBitEntity;
 import XiGyoku.furyborn.entity.RobixEntity;
 import XiGyoku.furyborn.entity.RobyteEntity;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -15,5 +16,6 @@ public class FuryBornModEvents {
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(FuryBornEntityTypes.ROBYTE.get(), RobyteEntity.createAttributes());
         event.put(FuryBornEntityTypes.ROBIX.get(), RobixEntity.createAttributes().build());
+        event.put(FuryBornEntityTypes.ROADBIKE_BIT.get(), RoadBikeBitEntity.createAttributes().build());
     }
 }

@@ -10,6 +10,9 @@ import XiGyoku.furyborn.client.util.HaloProjectorRenderer;
 import XiGyoku.furyborn.blockentity.FuryBornBlockEntities;
 import XiGyoku.furyborn.blockentity.ExolumenControllerBlockEntity;
 import XiGyoku.furyborn.blockentity.PortalAnimationState;
+import XiGyoku.furyborn.entity.RoadBikeBitEntity;
+import XiGyoku.furyborn.network.FuryBornNetwork;
+import XiGyoku.furyborn.network.PacketBikeRebellion;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -22,10 +25,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -33,7 +33,6 @@ import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = "furyborn", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class FuryBornModClientEvents {
-
     @SubscribeEvent
     public static void registerOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAboveAll(
@@ -90,6 +89,14 @@ public class FuryBornModClientEvents {
             "key.categories.furyborn"
     );
 
+    public static final KeyMapping TOGGLE_REBELLION = new KeyMapping(
+            "key.furyborn.toggle_rebellion",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_R,
+            "key.categories.furyborn"
+    );
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
@@ -115,5 +122,7 @@ public class FuryBornModClientEvents {
         event.register(SHOOT_LASER_BIT);
         event.register(DRIVESHIFT_DASH);
         event.register(DRIVESHIFT_BACKSTAB);
+        event.register(TOGGLE_REBELLION);
     }
 }
+

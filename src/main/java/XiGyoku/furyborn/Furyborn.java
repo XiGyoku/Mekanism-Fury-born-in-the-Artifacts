@@ -82,6 +82,7 @@ public class Furyborn {
         output.accept(FuryBornItems.UNKNOWN_CIRCUIT.get());
         output.accept(FuryBornItems.MEKA_SUNFLOWER.get());
         output.accept(FuryBornItems.EXOLUMEN_DATAMODEL.get());
+        output.accept(FuryBornItems.ROADBIKE_BIT_ITEM.get());
     }).build());
 
     public Furyborn() {
@@ -143,6 +144,7 @@ public class Furyborn {
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), RobyteBitLaserRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_LASER.get(), RobyteLaserRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBIX.get(), RobixRenderer::new);
+            EntityRenderers.register(FuryBornEntityTypes.ROADBIKE_BIT.get(), RoadBikeBitRenderer::new);
 
             event.enqueueWork(() -> {
                 CuriosRendererRegistry.register(FuryBornItems.HALO_OF_EXOLUMEN.get(), HaloOfExolumenRenderer::new);

@@ -48,5 +48,10 @@ public class FuryBornNetwork {
                 PacketUpdateHaloProjector::toBytes,
                 PacketUpdateHaloProjector::new,
                 PacketUpdateHaloProjector::handle);
+        CHANNEL.registerMessage(id++, PacketBikeRebellion.class,
+                PacketBikeRebellion::toBytes,
+                PacketBikeRebellion::new,
+                PacketBikeRebellion::handle
+        );
     }
 }

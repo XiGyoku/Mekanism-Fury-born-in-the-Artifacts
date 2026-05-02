@@ -1,15 +1,11 @@
 package XiGyoku.furyborn.client.event;
 
+import XiGyoku.furyborn.entity.RoadBikeBitEntity;
 import XiGyoku.furyborn.item.HaloOfExolumenItem;
 import XiGyoku.furyborn.item.ItemBusterThrower;
 import XiGyoku.furyborn.item.SunRaiserDriveItem;
 import XiGyoku.furyborn.item.SystemXrossAliveItem;
-import XiGyoku.furyborn.network.FuryBornNetwork;
-import XiGyoku.furyborn.network.PacketDirectionalDash;
-import XiGyoku.furyborn.network.PacketShootLaserBit;
-import XiGyoku.furyborn.network.PacketTargetTeleport;
-import XiGyoku.furyborn.network.PacketToggleAfterImage;
-import XiGyoku.furyborn.network.PacketToggleBusterMode;
+import XiGyoku.furyborn.network.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +17,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod.EventBusSubscriber(modid = "furyborn", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientKeyInputEvent {
+    private static boolean wasRebellionPressed = false;
 
     @SubscribeEvent
     public static void onKeyInput(InputEvent.Key event) {
@@ -96,6 +93,13 @@ public class ClientKeyInputEvent {
                     player.getPersistentData().putInt("DriveshiftGreenTicks", 40);
                     FuryBornNetwork.CHANNEL.sendToServer(new PacketTargetTeleport());
                 }
+            }
+        }
+        if (mc.player != null && mc.player.getVehicle() instanceof RoadBikeBitEntity) {
+            boolean isPressed = FuryBornModClientEvents.TOGGLE_REBELLION.isDown();
+            if (isPressed != wasRebellionPressed) {
+                wasRebellionPressed = isPressed;
+                FuryBornNetwork.CHANNEL.sendToServer(new PacketBikeRebellion(isPressed));
             }
         }
     }

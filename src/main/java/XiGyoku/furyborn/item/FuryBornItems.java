@@ -257,6 +257,9 @@ public class FuryBornItems {
                         }
                     });
 
+    public static final RegistryObject<Item> ROADBIKE_BIT_ITEM = Furyborn.ITEMS.register("roadbike_bit",
+            () -> new RoadBikeBitItem(new Item.Properties().stacksTo(1)));
+
 
     public static void register(IEventBus eventBus){
     }

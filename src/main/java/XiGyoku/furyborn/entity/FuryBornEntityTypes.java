@@ -48,6 +48,13 @@ public class FuryBornEntityTypes {
                             .sized(0.6f, 1.8f)
                             .build("robix"));
 
+    public static final RegistryObject<EntityType<RoadBikeBitEntity>> ROADBIKE_BIT =
+            ENTITY_TYPES.register("roadbike_bit",
+                    () -> EntityType.Builder.of(RoadBikeBitEntity::new, MobCategory.MISC)
+                            .sized(0.5f, 0.5f)
+                            .clientTrackingRange(64)
+                            .build("roadbike_bit"));
+
     public static void register(IEventBus eventBus) {
             ENTITY_TYPES.register(eventBus);
     }
