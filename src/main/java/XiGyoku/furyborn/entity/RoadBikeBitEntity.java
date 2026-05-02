@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -128,6 +129,25 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
             BikeAnimState currentState = getBikeState();
             if (currentState == BikeAnimState.REBELLION_LOOP) {
                 performRebellionAttack();
+            }
+        }
+
+        if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
+            float bikeYaw = this.getYRot();
+            player.fallDistance = 0.0F;
+            player.yBodyRotO = player.yBodyRot;
+            player.setYBodyRot(bikeYaw);
+
+            if (this.getBikeState() != BikeAnimState.IDLE) {
+                float yawDiff = Mth.wrapDegrees(bikeYaw - player.getYRot());
+
+                float newYaw = player.getYRot() + (yawDiff * 0.2F);
+
+                player.yRotO = player.getYRot();
+                player.yHeadRotO = player.yHeadRot;
+
+                player.setYRot(newYaw);
+                player.setYHeadRot(newYaw);
             }
         }
     }
@@ -328,5 +348,14 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    @Override
+    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
+        return false;
+    }
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
     }
 }
