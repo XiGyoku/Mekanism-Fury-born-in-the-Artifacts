@@ -1,11 +1,9 @@
 package XiGyoku.furyborn.entity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,6 +27,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import XiGyoku.furyborn.item.FuryBornItems;
+import net.minecraft.util.Mth;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
 
     private static final EntityDataAccessor<String> ANIM_STATE = SynchedEntityData.defineId(RoadBikeBitEntity.class, EntityDataSerializers.STRING);
 
-    private static final float MAX_SPEED = 1.0f;
+    private static final float MAX_SPEED = 1.5f;
     private static final float ACCELERATION = 0.02f;
     private static final float DECELERATION = 0.08f;
 
@@ -50,6 +49,21 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
     private int animTimer = 0;
 
     public boolean isRebellionKeyPressed = false;
+
+    public float targetBankAngle = 0.0f;
+    public float currentBankAngle = 0.0f;
+    public float prevBankAngle = 0.0f;
+
+    public static class TrailPoint {
+        public final Vec3 left;
+        public final Vec3 right;
+        public TrailPoint(Vec3 left, Vec3 right) {
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    public final java.util.LinkedList<TrailPoint> trailPositions = new java.util.LinkedList<>();
 
     public RoadBikeBitEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -118,6 +132,35 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
     }
 
     @Override
+    public void positionRider(Entity passenger, Entity.MoveFunction callback) {
+        if (this.hasPassenger(passenger)) {
+            double offsetHeight = this.getPassengersRidingOffset() + passenger.getMyRidingOffset();
+            double pivotY = this.getBbHeight() / 2.0D;
+
+            float radBank = (float) Math.toRadians(this.currentBankAngle);
+            double yOffsetFromPivot = offsetHeight - pivotY;
+
+            double rotatedY = Math.cos(radBank) * yOffsetFromPivot + pivotY;
+            double rotatedX = -Math.sin(radBank) * yOffsetFromPivot;
+
+            float radYaw = (float) Math.toRadians(-this.getYRot());
+            double offsetX = rotatedX * Math.cos(radYaw);
+            double offsetZ = rotatedX * Math.sin(radYaw);
+
+            callback.accept(passenger, this.getX() + offsetX, this.getY() + rotatedY, this.getZ() + offsetZ);
+        }
+    }
+
+    @Override
+    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
+        return false;
+    }
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
+    }
+
+    @Override
     public void tick() {
         super.tick();
 
@@ -125,22 +168,46 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
             animTimer--;
         }
 
+        this.prevBankAngle = this.currentBankAngle;
+        if (this.currentBankAngle < this.targetBankAngle) {
+            this.currentBankAngle = Math.min(this.currentBankAngle + 2.0f, this.targetBankAngle);
+        } else if (this.currentBankAngle > this.targetBankAngle) {
+            this.currentBankAngle = Math.max(this.currentBankAngle - 2.0f, this.targetBankAngle);
+        }
+
         if (!this.level().isClientSide()) {
             BikeAnimState currentState = getBikeState();
             if (currentState == BikeAnimState.REBELLION_LOOP) {
                 performRebellionAttack();
             }
+        } else {
+            double speed = this.position().distanceTo(new Vec3(this.xo, this.yo, this.zo));
+            if (speed > MAX_SPEED * 0.4f) {
+                Vec3 center = this.position().add(0, 0.4, 0);
+                float width = 0.2f;
+                float rad = (float) Math.toRadians(-this.getYRot());
+                Vec3 left = center.add(new Vec3(width, 0, -0.2).yRot(rad));
+                Vec3 right = center.add(new Vec3(-width, 0, -0.2).yRot(rad));
+
+                trailPositions.addFirst(new TrailPoint(left, right));
+                if (trailPositions.size() > 15) {
+                    trailPositions.removeLast();
+                }
+            } else if (!trailPositions.isEmpty()) {
+                trailPositions.removeLast();
+            }
         }
 
         if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
             float bikeYaw = this.getYRot();
+
             player.fallDistance = 0.0F;
+
             player.yBodyRotO = player.yBodyRot;
             player.setYBodyRot(bikeYaw);
 
             if (this.getBikeState() != BikeAnimState.IDLE) {
                 float yawDiff = Mth.wrapDegrees(bikeYaw - player.getYRot());
-
                 float newYaw = player.getYRot() + (yawDiff * 0.2F);
 
                 player.yRotO = player.getYRot();
@@ -222,6 +289,14 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
 
                 state = getBikeState();
 
+                if (state == BikeAnimState.LEFT_LOOP || state == BikeAnimState.LEFT_THROTTLE) {
+                    this.targetBankAngle = -20.0f;
+                } else if (state == BikeAnimState.RIGHT_LOOP || state == BikeAnimState.RIGHT_THROTTLE) {
+                    this.targetBankAngle = 20.0f;
+                } else {
+                    this.targetBankAngle = 0.0f;
+                }
+
                 if (state == BikeAnimState.LEFT_LOOP) {
                     this.setYRot(this.getYRot() - 4.0f);
                 } else if (state == BikeAnimState.RIGHT_LOOP) {
@@ -237,6 +312,8 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
                         setBikeState(BikeAnimState.IDLE);
                     }
                 }
+            } else {
+                this.targetBankAngle = 0.0f;
             }
 
             if (forwardInput > 0) {
@@ -268,6 +345,7 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
 
         } else {
             this.currentSpeed = 0;
+            this.targetBankAngle = 0.0f;
             this.setBikeState(BikeAnimState.IDLE);
             super.travel(movementInput);
         }
@@ -348,14 +426,5 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
-    }
-
-    @Override
-    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
-        return false;
-    }
-
-    @Override
-    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
     }
 }

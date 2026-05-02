@@ -6,6 +6,7 @@ import XiGyoku.furyborn.blockentity.ExolumenControllerBlockEntity;
 import XiGyoku.furyborn.blockentity.PortalAnimationState;
 import XiGyoku.furyborn.client.entity.DriveshiftParticleRenderer;
 import XiGyoku.furyborn.client.util.TargetMarkManager;
+import XiGyoku.furyborn.entity.RoadBikeBitEntity;
 import XiGyoku.furyborn.item.FuryBornItems;
 import XiGyoku.furyborn.client.util.ColorUtil;
 import XiGyoku.furyborn.client.util.GeometryHelper;
@@ -13,6 +14,7 @@ import XiGyoku.furyborn.client.util.PhotonRenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import mekanism.common.entity.EntityRobit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -20,6 +22,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -29,12 +32,14 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -647,6 +652,27 @@ public class FuryBornEventBusClientEvents {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRenderPre(RenderPlayerEvent.Pre event) {
+        Player player = event.getEntity();
+        if (player.getVehicle() instanceof RoadBikeBitEntity bike) {
+            PoseStack poseStack = event.getPoseStack();
+            poseStack.pushPose();
+            float bankAngle = Mth.lerp(event.getPartialTick(), bike.prevBankAngle, bike.currentBankAngle);
+            float bodyYaw = Mth.lerp(event.getPartialTick(), player.yBodyRotO, player.yBodyRot);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(-bankAngle));
+            poseStack.mulPose(Axis.YP.rotationDegrees(-(180.0F - bodyYaw)));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRenderPost(RenderPlayerEvent.Post event) {
+        if (event.getEntity().getVehicle() instanceof RoadBikeBitEntity) {
+            event.getPoseStack().popPose();
         }
     }
 }
