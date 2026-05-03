@@ -661,11 +661,21 @@ public class FuryBornEventBusClientEvents {
         if (player.getVehicle() instanceof RoadBikeBitEntity bike) {
             PoseStack poseStack = event.getPoseStack();
             poseStack.pushPose();
+
             float bankAngle = Mth.lerp(event.getPartialTick(), bike.prevBankAngle, bike.currentBankAngle);
+            float pitchAngle = Mth.lerp(event.getPartialTick(), bike.prevPitchAngle, bike.currentPitchAngle);
             float bodyYaw = Mth.lerp(event.getPartialTick(), player.yBodyRotO, player.yBodyRot);
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(-bankAngle));
-            poseStack.mulPose(Axis.YP.rotationDegrees(-(180.0F - bodyYaw)));
+
+            poseStack.mulPose(Axis.YP.rotationDegrees(-bodyYaw));
+
+            poseStack.translate(0.0D, -0.25D, 0.0D);
+
+            poseStack.mulPose(Axis.ZP.rotationDegrees(bankAngle));
+            poseStack.mulPose(Axis.XP.rotationDegrees(-pitchAngle));
+
+            poseStack.translate(0.0D, 0.25D, 0.0D);
+
+            poseStack.mulPose(Axis.YP.rotationDegrees(bodyYaw));
         }
     }
 

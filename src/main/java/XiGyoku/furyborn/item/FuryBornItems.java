@@ -258,7 +258,13 @@ public class FuryBornItems {
                     });
 
     public static final RegistryObject<Item> ROADBIKE_BIT_ITEM = Furyborn.ITEMS.register("roadbike_bit",
-            () -> new RoadBikeBitItem(new Item.Properties().stacksTo(1)));
+            () -> new RoadBikeBitItem(new Item.Properties().rarity(FuryBornRarities.STARRY).stacksTo(1)){
+                @Override
+                public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                    super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                    pTooltipComponents.add(Component.translatable("item.furyborn.roadbike_bit_desc").withStyle(ChatFormatting.GRAY));
+                }
+            });
 
 
     public static void register(IEventBus eventBus){

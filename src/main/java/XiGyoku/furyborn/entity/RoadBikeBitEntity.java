@@ -18,6 +18,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -36,8 +39,9 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
 
     private static final EntityDataAccessor<String> ANIM_STATE = SynchedEntityData.defineId(RoadBikeBitEntity.class, EntityDataSerializers.STRING);
 
-    private static final float MAX_SPEED = 1.5f;
-    private static final float ACCELERATION = 0.02f;
+    private static final float MAX_SPEED = 1.0f;
+    private static final float REBELLION_SPEED = 1.5f;
+    private static final float ACCELERATION = 0.04f;
     private static final float DECELERATION = 0.08f;
 
     private static final int TICK_THROTTLE = 5;
@@ -54,6 +58,10 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
     public float currentBankAngle = 0.0f;
     public float prevBankAngle = 0.0f;
 
+    public float targetPitchAngle = 0.0f;
+    public float currentPitchAngle = 0.0f;
+    public float prevPitchAngle = 0.0f;
+
     public static class TrailPoint {
         public final Vec3 left;
         public final Vec3 right;
@@ -67,13 +75,13 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
 
     public RoadBikeBitEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
-        this.setMaxUpStep(1.0f);
+        this.setMaxUpStep(2.0f);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.3D)
+                .add(Attributes.MOVEMENT_SPEED, 0.8D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
@@ -128,7 +136,7 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public double getPassengersRidingOffset() {
-        return super.getPassengersRidingOffset() - 0.25D;
+        return super.getPassengersRidingOffset() + 0.175D;
     }
 
     @Override
@@ -175,15 +183,22 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
             this.currentBankAngle = Math.max(this.currentBankAngle - 2.0f, this.targetBankAngle);
         }
 
+        this.prevPitchAngle = this.currentPitchAngle;
+        if (this.currentPitchAngle < this.targetPitchAngle) {
+            this.currentPitchAngle = Math.min(this.currentPitchAngle + 2.0f, this.targetPitchAngle);
+        } else if (this.currentPitchAngle > this.targetPitchAngle) {
+            this.currentPitchAngle = Math.max(this.currentPitchAngle - 2.0f, this.targetPitchAngle);
+        }
+
         if (!this.level().isClientSide()) {
             BikeAnimState currentState = getBikeState();
-            if (currentState == BikeAnimState.REBELLION_LOOP) {
+            if (currentState == BikeAnimState.REBELLION_LOOP || currentState == BikeAnimState.REBELLION_START || this.isRebellionKeyPressed) {
                 performRebellionAttack();
             }
         } else {
             double speed = this.position().distanceTo(new Vec3(this.xo, this.yo, this.zo));
-            if (speed > MAX_SPEED * 0.4f) {
-                Vec3 center = this.position().add(0, 0.4, 0);
+            if (speed > 0.3f) {
+                Vec3 center = this.position().add(0, -0.05, 0);
                 float width = 0.2f;
                 float rad = (float) Math.toRadians(-this.getYRot());
                 Vec3 left = center.add(new Vec3(width, 0, -0.2).yRot(rad));
@@ -316,9 +331,18 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
                 this.targetBankAngle = 0.0f;
             }
 
-            if (forwardInput > 0) {
+            state = getBikeState();
+            if (state == BikeAnimState.REBELLION_START || state == BikeAnimState.REBELLION_LOOP) {
+                this.targetPitchAngle = 20.0f;
+            } else {
+                this.targetPitchAngle = 0.0f;
+            }
+
+            float maxSpeedToUse = (state == BikeAnimState.REBELLION_LOOP || state == BikeAnimState.REBELLION_START) ? REBELLION_SPEED : MAX_SPEED;
+
+            if (state == BikeAnimState.REBELLION_LOOP || state == BikeAnimState.REBELLION_START || forwardInput > 0) {
                 currentSpeed += ACCELERATION;
-                if (currentSpeed > MAX_SPEED) currentSpeed = MAX_SPEED;
+                if (currentSpeed > maxSpeedToUse) currentSpeed = maxSpeedToUse;
             } else if (forwardInput < 0) {
                 currentSpeed -= ACCELERATION;
                 if (currentSpeed < -MAX_SPEED / 2.0f) currentSpeed = -MAX_SPEED / 2.0f;
@@ -337,30 +361,36 @@ public class RoadBikeBitEntity extends PathfinderMob implements GeoEntity {
             this.yHeadRot = this.getYRot();
             passenger.setYBodyRot(this.getYRot());
 
-            Vec3 moveVector = new Vec3(0, 0, currentSpeed).yRot(-this.getYRot() * ((float)Math.PI / 180F));
-            Vec3 currentMotion = this.getDeltaMovement();
-            this.setDeltaMovement(new Vec3(moveVector.x, currentMotion.y, moveVector.z));
-
-            super.travel(new Vec3(0, movementInput.y, 0));
+            this.setSpeed(Math.abs(currentSpeed));
+            super.travel(new Vec3(0, movementInput.y, Math.signum(currentSpeed)));
 
         } else {
             this.currentSpeed = 0;
             this.targetBankAngle = 0.0f;
+            this.targetPitchAngle = 0.0f;
             this.setBikeState(BikeAnimState.IDLE);
+            this.setSpeed(0);
             super.travel(movementInput);
         }
     }
 
     private void performRebellionAttack() {
-        Vec3 forward = this.getLookAngle().scale(2.0);
-        AABB attackBox = this.getBoundingBox().move(forward).inflate(1.5D, 0.5D, 1.5D);
+        Vec3 forward = Vec3.directionFromRotation(0, this.getYRot()).normalize();
+
+        AABB attackBox = this.getBoundingBox()
+                .expandTowards(forward.scale(2.5D))
+                .inflate(1.0D, 1.0D, 1.0D);
+
         List<Entity> targets = this.level().getEntities(this, attackBox);
+        Entity rider = this.getControllingPassenger();
+        DamageSource source = rider instanceof Player ? this.damageSources().playerAttack((Player) rider) : this.damageSources().mobAttack(this);
 
         for (Entity target : targets) {
-            if (target instanceof LivingEntity living && target != this.getControllingPassenger()) {
-                living.hurt(this.damageSources().mobAttack(this), 15.0F);
-                Vec3 knockbackDir = target.position().subtract(this.position()).normalize();
-                living.knockback(1.5D, -knockbackDir.x, -knockbackDir.z);
+            if (target instanceof LivingEntity living && !this.hasPassenger(target)) {
+                boolean isHit = living.hurt(source, 10.0F);
+                if (isHit) {
+                    living.knockback(2.0D, -forward.x, -forward.z);
+                }
             }
         }
     }

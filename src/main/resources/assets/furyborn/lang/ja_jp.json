@@ -4,6 +4,7 @@
   "entity.furyborn.robyte_bit_laser": "レーザービット",
   "entity.furyborn.robyte_laser": "量子光線",
   "entity.furyborn.robix": "ロビックス",
+  "entity.furyborn.roadbike_bit": "ロビットバイク",
   "item.furyborn.robyte_spawn_egg": "反逆のロビットのスポーンエッグ",
   "subtitles.furyborn.t_supercomputer_loading": "スーパーコンピュータが起動しています",
   "subtitles.furyborn.robyte_teleport": "反逆のロビットのテレポート",
@@ -44,6 +45,8 @@
   "item.furyborn.exolumen_datamodel_desc1": "あらゆる光が封じられたデータモデル。先時代の開発者らが遺した情報が記録されている。",
   "item.furyborn.exolumen_datamodel_desc2": "§4§l[権限規定により表示不可]",
   "item.furyborn.robix_spawn_egg": "ロビックスのスポーンエッグ",
+  "item.furyborn.roadbike_bit": "ロビットバイク",
+  "item.furyborn.roadbike_bit_desc": "バイクの見た目をしたロビット。シフト右クリックで回収出来る。",
   "block.furyborn.halo_projector": "機星プロジェクター",
   "block.furyborn.halo_projector_desc": "前世紀を映し出す映写装置。宇宙世紀の記録が保存されている。",
   "block.furyborn.mek_dirt": "土マシン",
@@ -71,8 +74,9 @@
   "key.furyborn.toggle_buster_mode": "量子光線放射器 出力切替",
   "key.furyborn.shoot_laser_bit": "レーザービットを発射する",
   "key.furyborn.driveshift_backstab": "ドライヴシフト中：量子テレポート（背後）",
-  "key.furyborn.driveshift_teleport": "ドライヴシフト中：量子テレポート",
+  "key.furyborn.driveshift_dash": "ドライヴシフト中：量子テレポート",
   "key.furyborn.toggle_afterimage": "ドライブシフト",
+  "key.furyborn.toggle_rebellion": "ロビットバイク: シフト",
   "tooltip.furyborn.buster_mode": "出力: ",
   "tooltip.furyborn.buster_mode.explosion": "最大",
   "tooltip.furyborn.buster_mode.none": "通常",
@@ -116,5 +120,7 @@
   "advancements.furyborn.buster_thrower.title": "Operation Meteor",
   "advancements.furyborn.buster_thrower.description": "量子光線放射器を手に入れる。",
   "advancements.furyborn.unknown_circuit.title": "未知の回路",
-  "advancements.furyborn.unknown_circuit.description": "反物質制御基盤を手にいれる。"
+  "advancements.furyborn.unknown_circuit.description": "反物質制御基盤を手にいれる。",
+  "advancements.furyborn.roadbike_bit.title": "ロードバイク・ザ・ロビット",
+  "advancements.furyborn.roadbike_bit.description": "ロビットバイクを手にいれる。"
 }

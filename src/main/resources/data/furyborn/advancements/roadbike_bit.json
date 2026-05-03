@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:roadbike_bit"
+    },
+    "title": {
+      "translate": "advancements.furyborn.roadbike_bit.title"
+    },
+    "description": {
+      "translate": "advancements.furyborn.roadbike_bit.description"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:unknown_circuit",
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:roadbike_bit"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

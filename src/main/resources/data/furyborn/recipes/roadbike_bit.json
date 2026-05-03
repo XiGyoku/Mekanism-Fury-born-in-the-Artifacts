@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BNU",
+    "NTR",
+    "UNU"
+  ],
+  "key": {
+    "R": {
+      "item": "furyborn:robyte_chip_awaken"
+    },
+    "T": {
+      "item": "furyborn:exolumen_datamodel"
+    },
+    "U": {
+      "item": "furyborn:unknown_circuit"
+    },
+    "N": {
+      "item": "furyborn:nanocore_ingot"
+    },
+    "B": {
+      "item": "mekanism:robit"
+    }
+  },
+  "result": {
+    "item": "furyborn:roadbike_bit"
+  }
+}

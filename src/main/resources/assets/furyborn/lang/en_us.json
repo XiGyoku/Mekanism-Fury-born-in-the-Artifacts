@@ -4,6 +4,7 @@
   "entity.furyborn.robyte_bit_laser": "Bit Laser",
   "entity.furyborn.robyte_laser": "Quantum Laser",
   "entity.furyborn.robix": "Robi-X",
+  "entity.furyborn.roadbike_bit": "Roadbike Bit",
   "item.furyborn.robyte_spawn_egg": "Robyte Spawn Egg",
   "subtitles.furyborn.t_supercomputer_loading": "Supercomputer boots up",
   "subtitles.furyborn.robyte_teleport": "Robyte teleports",
@@ -44,6 +45,8 @@
   "item.furyborn.exolumen_datamodel_desc1": "A data model that contains all sealed light. It records information left by the developers of the previous era.",
   "item.furyborn.exolumen_datamodel_desc2": "§4§l[CENSORED]",
   "item.furyborn.robix_spawn_egg": "Robi-X Spawn Egg",
+  "item.furyborn.roadbike_bit": "Roadbike Bit",
+  "item.furyborn.roadbike_bit_desc": "A Robit that looks like a road bike. Can be recalled by shift right-clicking.",
   "block.furyborn.halo_projector": "Halo Projector",
   "block.furyborn.halo_projector_desc": "A projection device that displays the last century. Records of the Universal Century are stored inside.",
   "block.furyborn.mek_dirt": "Dirt Machine",
@@ -71,8 +74,9 @@
   "key.furyborn.toggle_buster_mode": "Toggle Buster Mode",
   "key.furyborn.shoot_laser_bit": "Shoot Laser Bit",
   "key.furyborn.driveshift_backstab": "Drive Shift: Quantum Teleport (Back)",
-  "key.furyborn.driveshift_teleport": "Drive Shift: Quantum Teleport",
+  "key.furyborn.driveshift_dash": "Drive Shift: Quantum Teleport",
   "key.furyborn.toggle_afterimage": "Drive Shift",
+  "key.furyborn.toggle_rebellion": "Roadbike Bit: Shift",
   "tooltip.furyborn.buster_mode": "Mode: ",
   "tooltip.furyborn.buster_mode.explosion": "Explosion",
   "tooltip.furyborn.buster_mode.none": "Normal",
@@ -116,5 +120,7 @@
   "advancements.furyborn.buster_thrower.title": "Operation Meteor",
   "advancements.furyborn.buster_thrower.description": "Obtain a Buster Thrower.",
   "advancements.furyborn.unknown_circuit.title": "Unknown Circuit",
-  "advancements.furyborn.unknown_circuit.description": "Obtain an Antimatter Control Circuit."
+  "advancements.furyborn.unknown_circuit.description": "Obtain an Antimatter Control Circuit.",
+  "advancements.furyborn.roadbike_bit.title": "Roadbike the Robit",
+  "advancements.furyborn.roadbike_bit.description": "Obtain a Roadbike Bit."
 }
